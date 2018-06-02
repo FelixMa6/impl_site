@@ -1,0 +1,36 @@
+{% extends "vp_web/base_site.html" %}
+{% load i18n static %}
+
+{% block extrastyle %}
+
+<style type="text/css">
+</style>
+
+{{ block.super }}
+<link rel="stylesheet" type="text/css" href="{% static "vp_web/css/dashboard.css" %}" />
+<link rel="stylesheet" type="text/css" href="{% static "vp_web/css/tablestyle.css" %}" />
+
+{% endblock %}
+
+
+
+{% block coltype %}colMS{% endblock %}
+
+{% block bodyclass %}{{ block.super }} dashboard{% endblock %}
+
+{% block breadcrumbs %}{% endblock %}
+
+{% block content %}
+
+
+    <div>
+        <h2><a href={% url 'vp_web:vp_web' %}> vp_web </a><h2>
+        <h2><a href={% url 'vp_web:index' %}> vp_web </a><h2>
+        <h2><a href={% url 'vp_web:lint_app' %}> lint_app </a><h2>
+        <h2><a href={% url 'vp_web:signoff_app' %}> signoff_app </a><h2>
+    </div>
+{% endblock %}
+
+{% block sidebar %}
+
+{% endblock %}

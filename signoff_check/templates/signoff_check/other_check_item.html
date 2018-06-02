@@ -1,0 +1,54 @@
+{% extends "signoff_check/base_site.html" %}
+{% load i18n static %}
+
+{% block extrastyle %}
+  {{ block.super }}
+  <link rel="stylesheet" type="text/css" href="{% static "signoff_check/css/changelists.css" %}" />
+  <link rel="stylesheet" type="text/css" href="{% static "signoff_check/css/forms.css" %}" />
+  {{ media.css }}
+  {% if not actions_on_top and not actions_on_bottom %}
+    <style>
+      #changelist table thead th:first-child {width: inherit}
+    </style>
+  {% endif %}
+{% endblock %}
+
+{% block extrahead %}
+{{ block.super }}
+{{ media.js }}
+{% endblock %}
+
+
+{% if not is_popup %}
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+<a href="{% url 'signoff_check:index' %}">{% trans 'Home' %}</a>
+</div>
+{% endblock %}
+{% endif %}
+
+{% block coltype %}flex{% endblock %}
+
+{% block content %}
+    <form id="changelist-form" method="post" enctype="multipart/form-data" novalidate>{% csrf_token %}
+
+    {% if errornote %}
+    <p class="errornote">
+    <pre> tt {{errornote|linebreaksbr}} </pre>
+    </p>
+    {% endif %}
+
+     {#<p class="errornote">#}
+     {#{{p|escape|safe|linebreaksbr}}#}
+     <p><pre><font color="#17202a">
+        {% autoescape off%}
+        {{p|linebreaks|safe|escape}}
+        {% endautoescape %}
+        </font></pre></p>
+
+    <div class="submit-row">
+        <input type="submit" value="Delete" class="default" name="_delete" />
+    </div>
+    </form>
+
+{% endblock %}

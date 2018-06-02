@@ -1,0 +1,53 @@
+404.html:{% block content %}
+500.html:{% block content %}
+add_feature.html:{% block content %}
+base.html:{% block blockbots %}<meta name="robots" content="NONE,NOARCHIVE" />{% endblock %}
+base.html:    <div id="content" class="{% block coltype %}colM{% endblock %}">
+base.html:        {% block content_title %}
+base.html:        {% block content %}
+base.html:        {{ content }}
+change_feature.html:{% block content %}
+change_form.html:{% block content %}<div id="content-main">
+change_list.html:{% block content %}
+change_list.html:  <div id="content-main">
+change_point.html:{% block content %}
+change_point.html:		<td>{{comment.content|linebreaks}}</td>
+change_point.html:	<label class="required" for="id_content">Comment:</label>
+change_point.html:	<textarea class="vLargeTextField" cols="40" id="id_content" maxlength="900" name="comment" rows="10"></textarea>
+component.html:{% block content %}
+coverage_count.html:{% block content %}
+coverage_trace.html:{% block content %}
+coverage_trace_org.html:{% block content %}
+cross_check_by_owner.html:{% block content %}
+cross_check_by_owner.html:            <td maxlength="200">{{ item.content}}</td>
+cross_check.html:{% block content %}
+delete_confirmation.html:{% block content %}
+delete_selected_confirmation.html:{% block content %}
+feature.html:{% block content %}
+gazer.html:{% block content %}
+_index.html:{% block content %}
+_index.html:<div id="content-main">
+_index.html:<div id="content-related">
+_index.html:                {% if entry.content_type %}
+_index.html:                    <span class="mini quiet">{% filter capfirst %}{{ entry.content_type }}{% endfilter %}</span>
+_index.html:                    <span class="mini quiet">{% trans 'Unknown content' %}</span>
+index.html:{% block content %}
+invalid_setup.html:{% block content %}
+login.html:{% block content_title %}{% endblock %}
+login.html:{% block content %}
+login.html:<div id="content-main">
+object_history.html:{% block content %}
+object_history.html:<div id="content-main">
+point.html:{% block content %}
+point.html:		<td>{{comment.content|linebreaks}}</td>
+point.html:	<label class="required" for="id_content">Comment:</label>
+point.html:	<textarea class="vLargeTextField" cols="40" id="id_content" maxlength="900" name="comment" rows="10"></textarea>
+register_status.html:{% block content %}
+review.html:{% block content %}
+status_list.html:{% block content %}
+user.html:{% block content %}
+vector.html:{% block content %}
+vector.html:		<td>{{comment.content|linebreaks}}</td>
+vector.html:	<label class="required" for="id_content">Content:</label>
+vector.html:	<textarea class="vLargeTextField" cols="40" id="id_content" maxlength="900" name="content" rows="10"></textarea>
+workspace.html:{% block content %}

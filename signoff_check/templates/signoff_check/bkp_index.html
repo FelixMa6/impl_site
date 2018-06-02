@@ -1,0 +1,47 @@
+{% extends "signoff_check/base_site.html" %}
+{% load i18n static %}
+
+{% block extrastyle %}
+
+<style type="text/css">
+</style>
+
+{{ block.super }}
+<link rel="stylesheet" type="text/css" href="{% static "signoff_check/css/dashboard.css" %}" />
+<link rel="stylesheet" type="text/css" href="{% static "signoff_check/css/tablestyle.css" %}" />
+
+{% endblock %}
+
+
+
+{% block coltype %}colMS{% endblock %}
+
+{% block bodyclass %}{{ block.super }} dashboard{% endblock %}
+
+{% block breadcrumbs %}{% endblock %}
+
+{% block content %}
+
+
+	<section id="ownerComponents">
+	<ul id="components">
+		<p> project: {{item.project}} </p>
+		<p> add time: {{item.add_time}} </p>
+		<p> fail total num:{{item.fail_total_number}} </p>
+		<p> design git: {{item.design_git}} </p>
+		<p> Fail case owner: </p>
+		{% for i in all %} 
+		<a href="{% url 'signoff_check:owner' i.id %}">{{i.owner}}</a> </br>
+		{% endfor %} 
+	</ul> <!-- End ul#components -->
+    </section>
+
+
+
+
+
+{% endblock %}
+
+{% block sidebar %}
+
+{% endblock %}

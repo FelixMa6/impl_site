@@ -1,0 +1,79 @@
+{% extends "signoff_check/base_site.html" %}
+{% load i18n static %}
+
+{% block extrastyle %}
+  {{ block.super }}
+  <link rel="stylesheet" type="text/css" href="{% static "signoff_check/css/changelists.css" %}" />
+  <link rel="stylesheet" type="text/css" href="{% static "signoff_check/css/forms.css" %}" />
+  {{ media.css }}
+  {% if not actions_on_top and not actions_on_bottom %}
+    <style>
+      #changelist table thead th:first-child {width: inherit}
+    </style>
+  {% endif %}
+{% endblock %}
+
+{% block extrahead %}
+{{ block.super }}
+{{ media.js }}
+{% endblock %}
+
+
+{% if not is_popup %}
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+<a href="{% url 'signoff_check:index' %}">{% trans 'Home' %}</a>
+</div>
+{% endblock %}
+{% endif %}
+
+{% block coltype %}flex{% endblock %}
+
+{% block content %}
+
+	<h2> PT multi corner result </h2>
+	<br> </br>
+
+{% for partition in partition_set %}
+    <h3><b><big> {{partition}}</big></b></h3>
+
+    {% for signoff_mode in signoff_mode_set %}
+   <div id="cross_check_summary" class="module">
+    <table>
+    <caption>
+        <a><b><big> {{signoff_mode}}</big></b></a>
+    </caption>
+     <thead>
+	    <tr>
+            {% for item in header %}
+		    <th scope="col" class="sortable column-type">
+		    <div class="clear">{{ item }}</div>
+            </th>
+            {% endfor %}
+	    </tr>
+    </thead>
+    <tbody>
+        {% for item in display_set %}
+        {% if item.partition == partition and item.signoff_mode == signoff_mode %}
+
+	    <tr class="{% cycle 'row1' 'row2' %}">
+            <th scope="row" text-align="left"><a href="{% url 'signoff_check:other_check_status' partition=item.partition corner=item.corner signoff_mode=item.signoff_mode %}"><font color="#417690">{{item.partition}}</font></a></th>
+            <td maxlength="200">{{ item.corner }}</td>
+            <td maxlength="200">{{ item.check }}</td>
+            <td maxlength="200">{{ item.status }}</td>
+            {#<td maxlength="200">{{ item.summit_time }}</td>#}
+            <td scope="row" text-align="left"><a href="{% url 'signoff_check:other_check_status' partition=item.partition corner=item.corner signoff_mode=item.signoff_mode %}"><font color="#417690">{{item.summit_time}}</font></a></td>
+            <td maxlength="200">{{ item.database_version }}</td>
+            <td maxlength="200">{{ item.check_owner}}</td>
+            <td scope="row" text-align="left"><a href="{% url 'signoff_check:update_comment' pk=item.pk%}"><font color="#417690">{{item.comment}}</font></a></td>
+	    </tr>
+        {% endif %}
+        {% endfor %}
+	</tbody>
+    </table>
+</div>
+<HR style="FILTER: alpha(opacity=100,finishopacity=0,style=2)" width="100%" color=#417690 SIZE=3>
+{% endfor %}
+{% endfor %}
+
+{% endblock %}

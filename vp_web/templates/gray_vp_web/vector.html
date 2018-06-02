@@ -1,0 +1,114 @@
+{% extends "vp_web/base_site.html" %}
+{% load i18n static %}
+
+{% block extrastyle %}
+  {{ block.super }}
+  <link rel="stylesheet" type="text/css" href="{% static "vp_web/css/changelists.css" %}" />
+  <link rel="stylesheet" type="text/css" href="{% static "vp_web/css/forms.css" %}" />
+  {{ media.css }}
+  {% if not actions_on_top and not actions_on_bottom %}
+    <style>
+      #changelist table thead th:first-child {width: inherit}
+    </style>
+  {% endif %}
+{% endblock %}
+
+{% block extrahead %}
+{{ block.super }}
+{{ media.js }}
+{% endblock %}
+
+
+{% if not is_popup %}
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+<a href="{% url 'vp_web:index' %}">{% trans 'Home' %}</a>
+&rsaquo; <a href="{% url 'vp_web:user' vector.bugowner_id %}">{{vector.bugowner|capfirst}}</a>
+&rsaquo; <a href="{% url 'vp_web:vector' vector.id %}">vector</a>
+&rsaquo; {{ vector.vector|capfirst }}
+</div>
+{% endblock %}
+{% endif %}
+
+{% block coltype %}flex{% endblock %}
+
+{% block content %}
+    <form id="changelist-form" method="post" enctype="multipart/form-data" novalidate>{% csrf_token %}
+    {% block field_sets %}
+    {% for fieldset in vrg_form %}
+      {% include "vp_web/includes/fieldset.html" %}
+    {% endfor %}
+    {% endblock %}
+     <fieldset class="module aligned ">
+    
+    <div class="results">
+    <h2>COMMENTS</h2>
+    <table id="result_list">
+	<thead>
+	    <tr>
+		<th scope="col" class="sortable column-type">
+		<div class="text">Index</div>
+		<div class="clear"></div>
+		</th>
+		<th scope="col" class="sortable column-type">
+		<div class="text">Create</div>
+		<div class="clear"></div>
+		</th>
+		<th scope="col" class="sortable column-type">
+		<div class="text">Author</div>
+		<div class="clear"></div>
+		</th>
+		<th scope="col" class="sortable column-type">
+		<div class="text">Content</div>
+		<div class="clear"></div>
+		</th>
+	    </tr>
+	</thead>
+	<tbody>
+	    {% for comment in vector.comment_set.all %}
+	    <tr class="{% cycle 'row1' 'row2' %}">
+		<td>{{forloop.counter}}</td>
+		<td>{{comment.add_time}}</td>
+		<td>{{comment.Assignee}}</td>
+		<td>{{comment.content|linebreaks}}</td>
+	    </tr>
+	    {% endfor %}
+	</tbody>
+    </table>
+    </div>
+
+{% if user.is_active and user.id == vector.bugowner_id %}   
+    {% for fieldset in action_form %}
+      {% include "vp_web/includes/fieldset.html" %}
+      {% endfor %}
+    <h2>ACTIONS</h2>
+    <div class="form-row field-type">
+    <div>
+	<label class="required" for="id_author">Author:</label>
+	<select id="id_author" name="author" required>
+	    {% for u in users %}
+	    <option value="{{u.id}}" {% ifequal u.id vector.bugowner_id %}selected="selected"{% endifequal %} >{{u.username}}</option>
+	    {% endfor %}
+	</select>
+    </div>
+    </div>
+
+    <div class="form-row field-type">
+    <div>
+	<label class="required" for="id_content">Content:</label>
+	<textarea class="vLargeTextField" cols="40" id="id_content" maxlength="900" name="content" rows="10"></textarea>
+    </div>
+    </div>
+
+</fieldset>
+
+<div class="submit-row">
+<input type="submit" value="Submit" class="default" name="_save" />
+</div>
+
+
+{% endif %}
+
+</form>
+
+{% endblock %}

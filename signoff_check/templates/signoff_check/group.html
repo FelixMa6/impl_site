@@ -1,0 +1,87 @@
+{% extends "signoff_check/base_site.html" %}
+{% load i18n static %}
+
+{% block extrastyle %}
+  {{ block.super }}
+  <link rel="stylesheet" type="text/css" href="{% static "signoff_check/css/changelists.css" %}" />
+  <link rel="stylesheet" type="text/css" href="{% static "signoff_check/css/forms.css" %}" />
+  {{ media.css }}
+  {% if not actions_on_top and not actions_on_bottom %}
+    <style>
+      #changelist table thead th:first-child {width: inherit}
+    </style>
+  {% endif %}
+{% endblock %}
+
+{% block extrahead %}
+{{ block.super }}
+{{ media.js }}
+{% endblock %}
+
+
+{% if not is_popup %}
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+<a href="{% url 'signoff_check:index' %}">{% trans 'Home' %}</a>
+</div>
+{% endblock %}
+{% endif %}
+
+{% block coltype %}flex{% endblock %}
+
+{% block content %}
+    <form id="changelist-form" method="post" enctype="multipart/form-data" novalidate>{% csrf_token %}
+
+    {% if errornote %}
+    <p class="errornote">
+        {{errornote}}
+    </p>
+    {% endif %}
+
+    {% if infos %}
+
+    {% block field_sets %}
+    {% for fieldset in infos %}
+      {% include "signoff_check/includes/fieldset.html" %}
+    {% endfor %}
+    {% endblock %}
+     <fieldset class="module aligned ">
+
+    {% endif %}
+
+    {#-------------------------------------------------------------------------#}
+    {#<p><a href="{% url 'signoff_check:gvim' ownercase.id %}"> gvim {{ownercase.id}} </a></p>#}
+    {#<p><a > gvim </a></p>#}
+    {#-------------------------------------------------------------------------#}
+    {#<div id="id_content" class="module">#}
+   <div>
+    <table>
+    <caption>
+	<a>Fail info</a>
+    </caption>
+     <thead>
+	    <tr>
+            {% for item in header %}
+		    <th scope="col" class="sortable column-type">
+		    <div class="clear">{{ item }}</div>
+            </th>
+            {% endfor %}
+	    </tr>
+    </thead>
+    <tbody>
+        {% for item in error_set %}
+
+	    <tr class="{% cycle 'row1' 'row2' %}">
+	        <th scope="row" text-align="left"><font color="#417690">{{item.num}}</font></th>
+            <td maxlength="200">{{ item.start_point}}</td>
+            <td maxlength="200">{{ item.end_point}}</td>
+            <td maxlength="200"><a href="{% url 'signoff_check:group_path' pk=item.pk path_id=item.num%}"><font color="#417690">{{ item.slack}}</font></a></td>
+	    </tr>
+        {% endfor %}
+	</tbody>
+    </table>
+    </div>
+
+    </form>
+
+{% endblock %}

@@ -1,0 +1,23 @@
+#!/usr/bin/env python
+
+import logging
+from datetime import datetime
+import sys
+import os
+
+logging.basicConfig(
+	filename = os.path.join(sys.path[0],'app.log'),
+	level = logging.INFO
+	)
+
+def log_basic(info):
+    time_now = str(datetime.today().strftime('%02m%02d %H-%M-%S'))
+    return "[{0}] : {1}".format(time_now,info)
+
+def log_debug(info):
+    info = log_basic(info)
+    logging.debug(info)
+
+def log_info(info):
+    info = log_basic(info)
+    logging.info(info)

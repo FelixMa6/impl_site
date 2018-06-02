@@ -1,0 +1,9 @@
+{% extends "release_check/base.html" %}
+
+{% block title %}{{ title }} | {{ site_title|default:_('Django site release_check') }}{% endblock %}
+
+{% block branding %}
+<h1 id="site-name"><a href="{% url 'release_check:index' %}">Release check result</a></h1>
+{% endblock %}
+
+{% block nav-global %}{% endblock %}

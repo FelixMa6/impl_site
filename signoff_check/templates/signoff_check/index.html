@@ -1,0 +1,93 @@
+{% extends "signoff_check/base_site.html" %}
+{% load i18n static %}
+
+{% block extrastyle %}
+  {{ block.super }}
+  <link rel="stylesheet" type="text/css" href="{% static "signoff_check/css/changelists.css" %}" />
+  <link rel="stylesheet" type="text/css" href="{% static "signoff_check/css/forms.css" %}" />
+  {{ media.css }}
+  {% if not actions_on_top and not actions_on_bottom %}
+    <style>
+      #changelist table thead th:first-child {width: inherit}
+    </style>
+  {% endif %}
+{% endblock %}
+
+{% block extrahead %}
+{{ block.super }}
+{{ media.js }}
+{% endblock %}
+
+
+{% if not is_popup %}
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+<a href="{% url 'signoff_check:index' %}">{% trans 'Home' %}</a>
+</div>
+{% endblock %}
+{% endif %}
+
+{% block coltype %}flex{% endblock %}
+
+{% block content %}
+    <div class="block_button">
+        <a href={% url 'signoff_check:other_check' %}> other check </a>
+    </div>
+
+	<h1> PT multi corner result </h1>
+	<br> </br>
+
+{% for partition in partition_set %}
+    <h3><b><big> {{partition}}</big></b></h3>
+
+    {% for signoff_mode in signoff_mode_set %}
+   <div class="pt_status">
+    <table>
+    <caption>
+        <a><b><big> {{signoff_mode}}</big></b></a>
+    </caption>
+     <thead>
+	    <tr>
+            {% for item in header %}
+		    <th scope="col" class="sortable column-type">
+		    <div class="clear">{{ item }}</div>
+            </th>
+            {% endfor %}
+	    </tr>
+    </thead>
+    <tbody>
+        {% for item in display_set %}
+        {% if item.partition == partition and item.signoff_mode == signoff_mode%}
+        {#{% if item.signoff_mode == signoff_mode %}#}
+        
+	    <tr class="{% cycle 'row1' 'row2' %}">
+            <th scope="row" text-align="left"><a href="{% url 'signoff_check:partition_status' partition=item.partition corner=item.corner signoff_mode=item.signoff_mode check_mode=item.check_mode%}"><font color="#417690">{{item.partition}}</font></a></th>
+
+        {% if item.fn == 'fast' %}
+        {#<td maxlength="200" bgcolor="#F9EBEA"><font color="#6A1E16">{{ item.corner }}</font></td>#}
+            <td maxlength="200" bgcolor="#F7DC6F"><a href="{% url 'signoff_check:partition_status' partition=item.partition corner=item.corner signoff_mode=item.signoff_mode check_mode=item.check_mode%}"><font color="#641E16">{{ item.corner }}</font></a></td>
+        {% else %}
+            <td maxlength="200">{{ item.corner }}</td>
+        {% endif %}
+            {#<td maxlength="200">{{ item.fn }}</td>#}
+            <td maxlength="200">{{ item.check_mode }}</td>
+            <td maxlength="200">{{ item.setup_wns }}</td>
+            <td maxlength="200">{{ item.setup_tns }}</td>
+            <td maxlength="200">{{ item.setup_nvp }}</td>
+            <td maxlength="200">{{ item.hold_wns }}</td>
+            <td maxlength="200">{{ item.hold_tns }}</td>
+            <td maxlength="200">{{ item.hold_nvp }}</td>
+            {#<td maxlength="200">{{ item.summit_time }}</td>#}
+            <td scope="row" text-align="left"><a href="{% url 'signoff_check:partition_status' partition=item.partition corner=item.corner signoff_mode=item.signoff_mode check_mode=item.check_mode %}"><font color="#417690">{{item.summit_time}}</font></a></td>
+            <td maxlength="200">{{ item.database_version }}</td>
+	    </tr>
+        {% endif %}
+        {% endfor %}
+	</tbody>
+    </table>
+</div>
+<HR style="FILTER: alpha(opacity=100,finishopacity=0,style=2)" width="100%" color=#417690 SIZE=3>
+    {% endfor %}
+{% endfor %}
+
+{% endblock %}

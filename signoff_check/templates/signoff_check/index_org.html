@@ -1,0 +1,237 @@
+{% extends "signoff_check/base_site.html" %}
+{% load i18n static %}
+
+{% block extrastyle %}
+
+<style type="text/css">
+</style>
+
+{{ block.super }}
+<link rel="stylesheet" type="text/css" href="{% static "signoff_check/css/dashboard.css" %}" />
+<link rel="stylesheet" type="text/css" href="{% static "signoff_check/css/tablestyle.css" %}" />
+
+{% endblock %}
+
+
+
+{% block coltype %}colMS{% endblock %}
+
+{% block bodyclass %}{{ block.super }} dashboard{% endblock %}
+
+{% block breadcrumbs %}{% endblock %}
+
+{% block content %}
+
+    <h2> R0 PT Result </h2>
+
+
+
+    <div id="felix" >
+        {% block field_sets %}
+        {% for fieldset in signoff_timing_infos %}
+          {% include "signoff_check/includes/fieldset1.html" %}
+        {% endfor %}
+        {% endblock %}
+    </div>
+
+{#<HR style="FILTER: alpha(opacity=100,finishopacity=0,style=2)" width="100%" color=#417690 SIZE=3>#}
+{#-------------------------------------------------------------------------#}
+
+
+    <div id="fail_list" class="module">
+    {% if ownercase_all_setup %}
+    <table>
+    <caption>
+	<a class="section">Setup violation of each owner</a>
+    </caption>
+     <thead>
+	    <tr>
+            {% for item in ownercase_header %}
+		    <th scope="col" class="sortable column-type" align="right">
+		    <div class="clear" ><a>{{ item }}</a></div>
+            </th>
+            {% endfor %}
+	    </tr>
+    </thead>
+    <tbody>
+        {% for item in ownercase_all_setup %}
+	    <tr class="{% cycle 'row1' 'row2' %}">
+	        <th scope="row" text-align="center"><a href="{% url 'signoff_check:owner' item.id %}"><font color="#417690">{{item.owner}}</font></a></th>
+            <td>{{ item.vio_type}}</td>
+            <td>{{ item.wns}}</td>
+            <td>{{ item.tns}}</td>
+            <td>{{ item.vio_number}}</td>
+	    </tr>
+        {% endfor %}
+	</tbody>
+    </table>
+    {% else %}
+    <h2> {{ cleannote }} </h2>
+    {% endif %}
+    </div>
+{#-------------------------------------------------------------------------#}
+    <div id="fail_list" class="module">
+    {% if ownercase_all_hold %}
+    <table>
+    <caption>
+	<a class="section">Hold violation of each owner</a>
+    </caption>
+     <thead>
+	    <tr>
+            {% for item in ownercase_header %}
+		    <th scope="col" class="sortable column-type" align="right">
+		    <div class="clear" ><a>{{ item }}</a></div>
+            </th>
+            {% endfor %}
+	    </tr>
+    </thead>
+    <tbody>
+        {% for item in ownercase_all_hold %}
+	    <tr class="{% cycle 'row1' 'row2' %}">
+	        <th scope="row" text-align="center"><a href="{% url 'signoff_check:owner' item.id %}"><font color="#417690">{{item.owner}}</font></a></th>
+            <td>{{ item.vio_type}}</td>
+            <td>{{ item.wns}}</td>
+            <td>{{ item.tns}}</td>
+            <td>{{ item.vio_number}}</td>
+	    </tr>
+        {% endfor %}
+	</tbody>
+    </table>
+    {% else %}
+    <h2> {{ cleannote }} </h2>
+    {% endif %}
+    </div>
+{#-------------------------------------------------------------------------#}
+
+    {% if signoff_power_infos%}
+    <div id="vclp_info" >
+        {% block field_sets_vclp %}
+        {% for fieldset in signoff_power_infos %}
+          {% include "signoff_check/includes/fieldset1.html" %}
+        {% endfor %}
+        {% endblock %}
+    </div>
+    {% endif %}
+
+    {% if tree_summary%}
+    <div id="vclp_list" class="module">
+    <table>
+    <caption>
+	<a class="section">VCLP Summary</a>
+    </caption>
+     <thead>
+	    <tr>
+            {% for item in tree_header %}
+		    <th scope="col" class="sortable column-type" align="right">
+		    <div class="clear" ><a>{{ item }}</a></div>
+            </th>
+            {% endfor %}
+	    </tr>
+    </thead>
+    <tbody>
+        {% for item in tree_summary%}
+	    <tr class="{% cycle 'row1' 'row2' %}">
+            <th scope="row" text-align="center"><a href="{% url 'signoff_check:tag' pk=item.pk vtag=item.tag %}"><font color="#417690">{{item.pk}}</font></a></th>
+            <th scope="row" text-align="center"><a href="{% url 'signoff_check:tag' pk=item.pk vtag=item.tag %}"><font color="#417690">{{item.severity}}</font></a></th>
+            {#<td>{{ item.severity}}</td>#}
+            <td>{{ item.stage}}</td>
+            {#<td><a href="{% url 'signoff_check:tag' pk=item.pk vtag=item.tag %}">{{ item.tag}}</a></td>#}
+            <td>{{ item.tag}}</td>
+            <td>{{ item.count}}</td>
+            <td>{{ item.waived}}</td>
+	    </tr>
+        {% endfor %}
+	</tbody>
+    </table>
+    </div>
+    {% else %}
+    {#<h2> {{ cleannote }} </h2>#}
+    {% endif %}
+
+
+<HR style="FILTER: alpha(opacity=100,finishopacity=0,style=2)" width="100%" color=#417690 SIZE=3>
+
+{#-------------------------group setup timing begin---------------------------------#}
+
+    <div id="check_design_2" class="module">
+    {% if pathgroup_all_setup %}
+    <table>
+    <caption>
+	<a class="section">Setup violation of each path group</a>
+    </caption>
+     <thead>
+	    <tr>
+            {% for item in path_group_header %}
+		    <th scope="col" class="sortable column-type" align="right">
+		    <div class="clear" ><a>{{ item }}</a></div>
+            </th>
+            {% endfor %}
+	    </tr>
+    </thead>
+    <tbody>
+        {% for item in pathgroup_all_setup %}
+	    <tr class="{% cycle 'row1' 'row2' %}">
+            <th scope="row" text-align="center"><a href="{% url 'signoff_check:group' item.id %}"><font color="#417690">{{item.group}}</font></a></th>
+            <td text-align="left" >{{ item.type}}</td>
+            <td text-align="left" >{{ item.nvp}}</td>
+            <td text-align="left" >{{ item.wns}}</td>
+            <td text-align="left" >{{ item.tns}}</td>
+            {#<td align="left" >{{ item.freq}}</td> #} 
+	    </tr>
+        {% endfor %}
+	</tbody>
+    </table>
+    {% else %}
+    <h2> {{ cleannote }} </h2>
+    {% endif %}
+    </div>
+
+{#-------------------------group hold timing begin---------------------------------#}
+
+    <div id="check_design_2" class="module">
+    {% if pathgroup_all_hold %}
+    <table>
+    <caption>
+	<a class="section">Hold violation of each path group</a>
+    </caption>
+     <thead>
+	    <tr>
+            {% for item in path_group_header %}
+		    <th scope="col" class="sortable column-type" align="right">
+		    <div class="clear" ><a>{{ item }}</a></div>
+            </th>
+            {% endfor %}
+	    </tr>
+    </thead>
+    <tbody>
+        {% for item in pathgroup_all_hold %}
+	    <tr class="{% cycle 'row1' 'row2' %}">
+            <th scope="row" text-align="center"><a href="{% url 'signoff_check:group' item.id %}"><font color="#417690">{{item.group}}</font></a></th>
+            <td text-align="left" >{{ item.type}}</td>
+            <td text-align="left" >{{ item.nvp}}</td>
+            <td text-align="left" >{{ item.wns}}</td>
+            <td text-align="left" >{{ item.tns}}</td>
+            {#<td align="left" >{{ item.freq}}</td> #} 
+	    </tr>
+        {% endfor %}
+	</tbody>
+    </table>
+    {% else %}
+    <h2> {{ cleannote }} </h2>
+    {% endif %}
+</div>
+
+<HR style="FILTER: alpha(opacity=100,finishopacity=0,style=2)" width="100%" color=#417690 SIZE=3>
+
+    <div>
+        <h2><a href={% url 'signoff_check:r0' %}> R0 stage result </a><h2>
+        <h2><a href={% url 'signoff_check:r1' %}> R1 stage result </a><h2>
+    </div>
+{#-------------------------------------------------------------------------#}
+{% endblock %}
+
+
+
+{% block sidebar %}
+
+{% endblock %}

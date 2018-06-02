@@ -1,0 +1,16 @@
+{% extends "signoff_check/base.html" %}
+
+{% block title %}{{ title }} | {{ site_title|default:_('Django site admin') }}{% endblock %}
+
+{% block branding %}
+<h1 id="site-name"><a href="{% url 'signoff_check:index' %}">Signoff check result</a></h1>
+{% endblock %}
+
+
+{% block nav-global-1 %}
+<h1 id="site-name"><a href="{% url 'lint_app:index' %}">Release check result</a></h1>
+{% endblock %}
+
+{% block nav-global-2 %}
+<h1 id="site-name"><a href="{% url 'be_qualify_app:index' %}">BE database check result</a></h1>
+{% endblock %}

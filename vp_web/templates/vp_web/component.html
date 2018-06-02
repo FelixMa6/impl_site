@@ -1,0 +1,75 @@
+{% extends "vp_web/base_site.html" %}
+{% load i18n static %}
+
+{% block extrastyle %}
+  {{ block.super }}
+  <link rel="stylesheet" type="text/css" href="{% static "vp_web/css/changelists.css" %}" />
+    <link rel="stylesheet" type="text/css" href="{% static "vp_web/css/forms.css" %}" />
+  {{ media.css }}
+  {% if not actions_on_top and not actions_on_bottom %}
+    <style>
+      #changelist table thead th:first-child {width: inherit}
+    </style>
+  {% endif %}
+{% endblock %}
+
+{% block extrahead %}
+{{ block.super }}
+{{ media.js }}
+{% endblock %}
+
+
+{% if not is_popup %}
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+<a href="{% url 'vp_web:index' %}">{% trans 'Home' %}</a>
+&rsaquo; <a href="{% url 'vp_web:component' component.id %}">Component</a>
+&rsaquo; {{ component.name|capfirst }}
+</div>
+{% endblock %}
+{% endif %}
+
+{% block coltype %}flex{% endblock %}
+
+{% block content %}
+    <form id="changelist-form" method="post" enctype="multipart/form-data" novalidate>{% csrf_token %}
+    <ul class="object-tools">
+    <li>
+    <a href="{% url 'vp_web:add_feature' component.id %}" class="addlink">ADD FEATURE</a>
+    </li>    
+</ul>
+
+    {% if owner_status_header %}
+    <div class="com_status">
+    <table id="result_list">
+         <thead>
+	    <tr>
+            {% for item in owner_status_header %}
+		    <th scope="col" class="sortable column-type">
+		    <div class="clear">{{ item }}</div>
+            </th>
+            {% endfor %}
+	    </tr>
+    </thead>
+    <tbody>
+        {% for item in owner_status %}
+
+	    <tr class="{% cycle 'row1' 'row2' %}">
+            <td><a href={% url 'vp_web:feature' item.pk %}>{{ item.feature}}</a></td>
+            <td>{{ item.owner}}</td>
+            <td>{{ item.all_feature_status}}</td>
+            <td>{{ item.all_coverage_status}}</td>
+            <td>{{ item.all_stimulus_status}}</td>
+            <td>{{ item.all_check_way_status}}</td>
+	    </tr>
+        {% endfor %}
+	</tbody>
+    </table>
+    </div>
+    {% else %}
+        <p class="errornote">There is no verification Feature</p>
+    {% endif %}
+
+
+    </form>
+{% endblock %}

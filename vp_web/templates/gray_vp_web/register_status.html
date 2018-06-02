@@ -1,0 +1,63 @@
+{% extends "vp_web/base_site.html" %}
+{% load i18n static %}
+
+{% block extrastyle %}
+  {{ block.super }}
+  <link rel="stylesheet" type="text/css" href="{% static "vp_web/css/changelists.css" %}" />
+  <link rel="stylesheet" type="text/css" href="{% static "vp_web/css/forms.css" %}" />
+  {{ media.css }}
+  {% if not actions_on_top and not actions_on_bottom %}
+    <style>
+      #changelist table thead th:first-child {width: inherit}
+    </style>
+  {% endif %}
+{% endblock %}
+
+{% block extrahead %}
+{{ block.super }}
+{{ media.js }}
+{% endblock %}
+
+
+{% if not is_popup %}
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+<a href="{% url 'vp_web:index' %}">{% trans 'Home' %}</a>
+</div>
+{% endblock %}
+{% endif %}
+
+{% block coltype %}flex{% endblock %}
+
+{% block content %}
+
+   <div id="cross_check_summary" class="module">
+    <table>
+    <caption>
+	<a >Class regiester status </a>
+    </caption>
+     <thead>
+	    <tr>
+            {% for item in header %}
+		    <th scope="col" class="sortable column-type">
+		    <div class="clear">{{ item }}</div>
+            </th>
+            {% endfor %}
+	    </tr>
+    </thead>
+    <tbody>
+        {% for item in class_register_check_result_set %}
+
+	    <tr class="{% cycle 'row1' 'row2' %}">
+	        <th scope="row" text-align="left"><a href="{% url 'vp_web:cross_check_result_by_owner' pk=item.pk type=item.type%}"><font color="#417690">{{item.owner}}</font></a></th>
+            <td maxlength="200">{{ item.total_cnt}}</td>
+            <td maxlength="200">{{ item.miss_cnt}}</td>
+            {#<td maxlength="200">{{ item.miss_rate}}</td>#}
+            <td maxlength="200"><a href="{% url 'vp_web:cross_check_result_by_owner' pk=item.pk type=item.type%}"><font color="#417690">{{ item.miss_rate}}</font></a></td>
+	    </tr>
+        {% endfor %}
+	</tbody>
+    </table>
+    </div>
+
+{% endblock %}

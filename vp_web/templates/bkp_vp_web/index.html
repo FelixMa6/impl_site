@@ -1,0 +1,70 @@
+{% extends "vp_web/base_site.html" %}
+{% load i18n static %}
+
+{% block extrastyle %}
+
+<style type="text/css">
+</style>
+
+{{ block.super }}
+<link rel="stylesheet" type="text/css" href="{% static "vp_web/css/dashboard.css" %}" />
+<link rel="stylesheet" type="text/css" href="{% static "vp_web/css/tablestyle.css" %}" />
+
+{% endblock %}
+
+
+
+{% block coltype %}colMS{% endblock %}
+
+{% block bodyclass %}{{ block.super }} dashboard{% endblock %}
+
+{% block breadcrumbs %}{% endblock %}
+
+{% block content %}
+
+
+	<section id="ownerComponents">
+    <ul id="components">
+        {% for component in components %}
+        <li class="component">
+				<ul class="componentContainer">
+                    <li class="design"><h2><a href={% url 'vp_web:component' component.id %}>{{component.name}}</a></h2></li>
+                    {#<li class="owner"><p><a href={% url 'vp_web:workspace' component.owner.id %}>{{component.owner}}</a></p></li>#}
+					<li>
+
+					</li>
+                    <li class="button"><a href={% url 'vp_web:component_status_list' component.id%}>Task Status</a></li>
+				</ul>
+		</li>
+        {% endfor %}
+
+	</ul> <!-- End ul#components -->
+    </section>
+
+
+<HR style="FILTER: alpha(opacity=100,finishopacity=0,style=2)" width="100%" color=#417690 SIZE=3>
+
+
+    	<section id="ownerComponents">
+    <ul id="components">
+        {% for component in special_components %}
+        <li class="component">
+				<ul class="componentContainer">
+                    <li class="design"><h2><a href={% url 'vp_web:component' component.id %}>{{component.name}}</a></h2></li>
+                    {#<li class="owner"><p><a href={% url 'vp_web:workspace' component.owner.id %}>{{component.owner}}</a></p></li>#}
+					<li>
+
+					</li>
+                    <li class="button"><a href={% url 'vp_web:component_status_list' component.id%}>Task Status</a></li>
+				</ul>
+		</li>
+        {% endfor %}
+
+	</ul> <!-- End ul#components -->
+    </section>
+
+{% endblock %}
+
+{% block sidebar %}
+
+{% endblock %}

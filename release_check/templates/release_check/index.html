@@ -1,0 +1,256 @@
+{% extends "release_check/base_site.html" %}
+{% load i18n static %}
+
+{% block extrastyle %}
+    <style type="text/css">
+    </style>
+
+  {{ block.super }}
+  <link rel="stylesheet" type="text/css" href="{% static "release_check/css/dashboard.css" %}" />
+  <link rel="stylesheet" type="text/css" href="{% static "release_check/css/tablestyle.css" %}" />
+
+{% endblock %}
+
+{% if not is_popup %}
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+<a href="{% url 'release_check:index' %}">{% trans 'Home' %}</a>
+</div>
+{% endblock %}
+{% endif %}
+
+{% block content %}
+    
+    <h1> Lint result </h1>
+
+    {% if infos %}
+    <div class="lint_result">
+        {% block field_sets %}
+        {% for fieldset in infos %}
+            {% include "release_check/includes/fieldset1.html"%}
+        {% endfor %}
+        {% endblock %}
+    </div>
+    {% endif %}
+
+{#-----------------------------------------------------------------------#}
+
+    <div class="lint_fail">
+    {% if all %}
+    <table>
+    <caption> Lint Fail </caption>
+    <thead>
+        <tr>
+            {% for item in header %}
+            <th scope="col" class="sortable column-type" align="left">
+                <div class="clear"><a>{{ item }}</a></div>
+            </th>
+            {% endfor %}
+        </tr>
+    </thead>
+    <tbody>
+        {% for item in all %}
+
+        <tr class="{% cycle 'row1' 'row2' %}">
+            <th scope="row" text-align="left"><a href="{% url 'release_check:owner' item.id %}"><font color="#417690">{{item.owner}}</font></a></th>
+            <td text-align="center">{{ item.fail_number }}</td>
+            <td text-align="center">{{ item.warn_number }}</td>
+            <td text-align="center">{{ item.info_number }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+    </table>
+    {% else %}
+    <h2> {{ note }} </h2>
+    {% endif %}
+    </div>
+
+<HR style="FILTER: alpha(opacity=100,finishopacity=0,style=2)" width="100%" color=#417690 SIZE=3>
+
+{#-----------------------------------------------------------------------#}
+
+    <div class="lint_fail">
+    {% if case_all_1 %}
+    <table>
+    <caption> {{table_title_1}}</caption>
+    <thead>
+        <tr>
+            {% for item in case_header_1 %}
+            <th scope="col" class="sortable column-type" align="left">
+                <div class="clear"><a>{{ item }}</a></div>
+            </th>
+            {% endfor %}
+        </tr>
+    </thead>
+    <tbody>
+        {% for item in case_all_1 %}
+
+        <tr class="{% cycle 'row1' 'row2' %}">
+            <th scope="row" text-align="left"><a href="{% url 'release_check:log' item.pk %}"><font color="#417690">{{item.c1_val}}</font></a></th>
+            {% if column_num_1 >= 2 %}<td text-align="center">{{ item.c2_val }}</td>{% endif %}
+            {% if column_num_1 >= 3 %}<td text-align="center">{{ item.c3_val }}</td>{% endif %}
+            {% if column_num_1 >= 4 %}<td text-align="center">{{ item.c4_val }}</td>{% endif %}
+            {% if column_num_1 >= 5 %}<td text-align="center">{{ item.c5_val }}</td>{% endif %}
+            {% if column_num_1 >= 6 %}<td text-align="center">{{ item.c6_val }}</td>{% endif %}
+        </tr>
+        {% endfor %}
+    </tbody>
+    </table>
+    {% else %}
+    <h2> {{ note }} </h2>
+    {% endif %}
+    </div>
+
+<HR style="FILTER: alpha(opacity=100,finishopacity=0,style=2)" width="100%" color=#417690 SIZE=3>
+
+{#-----------------------------------------------------------------------#}
+
+    <div class="lint_fail">
+    {% if case_all_2 %}
+    <table>
+    <caption> {{table_title_2}}</caption>
+    <thead>
+        <tr>
+            {% for item in case_header_2 %}
+            <th scope="col" class="sortable column-type" align="left">
+                <div class="clear"><a>{{ item }}</a></div>
+            </th>
+            {% endfor %}
+        </tr>
+    </thead>
+    <tbody>
+        {% for item in case_all_2 %}
+
+        <tr class="{% cycle 'row1' 'row2' %}">
+            <th scope="row" text-align="left"><a href="{% url 'release_check:log' item.pk %}"><font color="#417690">{{item.c1_val}}</font></a></th>
+            {% if column_num_2 >= 2 %}<td text-align="center">{{ item.c2_val }}</td>{% endif %}
+            {% if column_num_2 >= 3 %}<td text-align="center">{{ item.c3_val }}</td>{% endif %}
+            {% if column_num_2 >= 4 %}<td text-align="center">{{ item.c4_val }}</td>{% endif %}
+            {% if column_num_2 >= 5 %}<td text-align="center">{{ item.c5_val }}</td>{% endif %}
+            {% if column_num_2 >= 6 %}<td text-align="center">{{ item.c6_val }}</td>{% endif %}
+        </tr>
+        {% endfor %}
+    </tbody>
+    </table>
+    {% else %}
+    <h2> {{ note }} </h2>
+    {% endif %}
+    </div>
+
+<HR style="FILTER: alpha(opacity=100,finishopacity=0,style=2)" width="100%" color=#417690 SIZE=3>
+{#-----------------------------------------------------------------------#}
+
+    <div class="lint_fail">
+    {% if case_all_3 %}
+    <table>
+    <caption> {{table_title_3}}</caption>
+    <thead>
+        <tr>
+            {% for item in case_header_3 %}
+            <th scope="col" class="sortable column-type" align="left">
+                <div class="clear"><a>{{ item }}</a></div>
+            </th>
+            {% endfor %}
+        </tr>
+    </thead>
+    <tbody>
+        {% for item in case_all_3 %}
+
+        <tr class="{% cycle 'row1' 'row2' %}">
+            <th scope="row" text-align="left"><a href="{% url 'release_check:log' item.pk %}"><font color="#417690">{{item.c1_val}}</font></a></th>
+            {% if column_num_3 >= 2 %}<td text-align="center">{{ item.c2_val }}</td>{% endif %}
+            {% if column_num_3 >= 3 %}<td text-align="center">{{ item.c3_val }}</td>{% endif %}
+            {% if column_num_3 >= 4 %}<td text-align="center">{{ item.c4_val }}</td>{% endif %}
+            {% if column_num_3 >= 5 %}<td text-align="center">{{ item.c5_val }}</td>{% endif %}
+            {% if column_num_3 >= 6 %}<td text-align="center">{{ item.c6_val }}</td>{% endif %}
+        </tr>
+        {% endfor %}
+    </tbody>
+    </table>
+    {% else %}
+    <h2> {{ note }} </h2>
+    {% endif %}
+    </div>
+
+<HR style="FILTER: alpha(opacity=100,finishopacity=0,style=2)" width="100%" color=#417690 SIZE=3>
+{#-----------------------------------------------------------------------#}
+
+    <div class="lint_fail">
+    {% if case_all_4 %}
+    <table>
+    <caption> {{table_title_4}}</caption>
+    <thead>
+        <tr>
+            {% for item in case_header_4 %}
+            <th scope="col" class="sortable column-type" align="left">
+                <div class="clear"><a>{{ item }}</a></div>
+            </th>
+            {% endfor %}
+        </tr>
+    </thead>
+    <tbody>
+        {% for item in case_all_4 %}
+
+        <tr class="{% cycle 'row1' 'row2' %}">
+            <th scope="row" text-align="left"><a href="{% url 'release_check:log' item.pk %}"><font color="#417690">{{item.c1_val}}</font></a></th>
+            {% if column_num_4 >= 2 %}<td text-align="center">{{ item.c2_val }}</td>{% endif %}
+            {% if column_num_4 >= 3 %}<td text-align="center">{{ item.c3_val }}</td>{% endif %}
+            {% if column_num_4 >= 4 %}<td text-align="center">{{ item.c4_val }}</td>{% endif %}
+            {% if column_num_4 >= 5 %}<td text-align="center">{{ item.c5_val }}</td>{% endif %}
+            {% if column_num_4 >= 6 %}<td text-align="center">{{ item.c6_val }}</td>{% endif %}
+        </tr>
+        {% endfor %}
+    </tbody>
+    </table>
+    {% else %}
+    <h2> {{ note }} </h2>
+    {% endif %}
+    </div>
+
+<HR style="FILTER: alpha(opacity=100,finishopacity=0,style=2)" width="100%" color=#417690 SIZE=3>
+{#-------------------------check_timing_processor begin---------------------------------#}
+
+    {% if check_timing_result_all %}
+    <h1> Check timing result </h1>
+    <div class="lint_result" >
+        {#{% block field_sets %}#}
+        {% for fieldset in check_timing_processor_infos %}
+          {% include "release_check/includes/fieldset1.html" %}
+        {% endfor %}
+        {#{% endblock %}#}
+    </div>
+    {% endif %}
+
+    <div class="lint_fail">
+    {% if check_timing_result_all %}
+    <table>
+    <caption>
+	Processor Fail Info
+    </caption>
+     <thead>
+	    <tr>
+            {% for item in header %}
+		    <th scope="col" class="sortable column-type" align="right">
+		    <div class="clear" ><a>{{ item }}</a></div>
+            </th>
+            {% endfor %}
+	    </tr>
+    </thead>
+    <tbody>
+        {% for item in check_timing_processor_all %}
+
+	    <tr class="{% cycle 'row1' 'row2' %}">
+	        <th scope="row" text-align="center"><a href="{% url 'release_check:owner' item.id %}"><font color="#417690">{{item.owner}}</font></a></th>
+            <td>{{ item.fail_number}}</td>
+	    </tr>
+        {% endfor %}
+	</tbody>
+    </table>
+    {% else %}
+    {# <h2>   no check timing result   </h2>#}
+    {% endif %}
+    </div>
+
+{#-------------------------check_timing_processor end----------------------------------#} 
+
+{% endblock %}

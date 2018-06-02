@@ -1,0 +1,25 @@
+{% load i18n static %}
+<div class="results">
+<table id="result_list">
+<thead>
+<tr>
+{% for header in result_headers %}
+<th scope="col" class="sortable column-type">
+   <div class="text">{{ header.text|capfirst }}</div>
+   <div class="clear"></div>
+</th>{% endfor %}
+</tr>
+</thead>
+
+{% if results %}
+<tbody>
+{% for result in results %}
+{% if result.form.non_field_errors %}
+    <tr><td colspan="{{ result|length }}">{{ result.form.non_field_errors }}</td></tr>
+{% endif %}
+<tr class="{% cycle 'row1' 'row2' %}">{% for item in result %}{{ item }}{% endfor %}</tr>
+{% endfor %}
+</tbody>
+</table>
+</div>
+{% endif %}

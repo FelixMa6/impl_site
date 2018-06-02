@@ -1,0 +1,72 @@
+{% load static from staticfiles %}<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>djangosnippets: {% block head_title %}Home{% endblock %}</title>
+  <script src="{% static 'js/modernizr.js' %}"></script>
+  <link rel="shortcut icon" type="image/x-icon" href="{% static "img/favicon.ico" %}" />
+  <link rel="stylesheet" href="{% static "vp_web/css/main.css" %}" type="text/css" />
+  {% block feeds %}{% endblock %}
+</head>
+<body class="{% block bodyclass %}{% endblock %}">
+  <div id="accountbar"><div class="inner">
+    <p>
+    {% url 'account_logout' as logout_url %}
+    {% url 'account_login' as login_url %}
+    {% if user.is_authenticated %}
+      Logged in as <a href="{{ user.get_absolute_url }}">{{ user.username }}</a> (<a href="{{ logout_url }}{% if request.path != login_url or request.path != logout_url %}?next={{ request.path }}{% endif %}">Logout</a>)
+    {% else %}
+      <a href="{{ login_url }}?next={% if request.path == logout_url or request.path == login_url %}/{% else %}{{ request.path }}{% endif %}">Login</a>
+    {% endif %}
+    </p>
+  </div></div>
+  <header><div class="inner">
+    <a title="Go back to the frontpage" href="{% url 'vp_web:index' %}" id="logo">Deephi<b> IC </b></a>
+    <nav>
+      <ul>
+        <li><a href="{% url 'vp_web:index' %}">VP web</a></li>
+        <li><a href="{% url 'vp_web:index' %}">VRG web</a></li>
+        <li><a href="{% url 'release_check:index' %}">Quality check</a></li>
+        <li><a href="{% url 'release_check:index' %}">Signoff check</a></li>
+      </ul>
+    </nav>
+  </div></header>
+  <div id="main">
+    {% block secondary_nav %}
+    <nav id="subnav">
+      <ul>
+        <li><a href="{% url 'vp_web:index' %}">release check</a></li>
+        <li><a href="{% url 'vp_web:index' %}">qualify check</a></li>
+      </ul>
+    </nav>
+    {% endblock %}
+
+  {% if messages %}
+    {% for message in messages %}
+      <div data-alert class="alert-box {% if message.tags %} {{ message.tags }}{% else %}message_info{% endif %}">
+        {{ message }}
+        <a href="#" class="close">&times;</a>
+      </div>
+    {% endfor %}
+  {% endif %}
+
+  <h1>{% block content_header %}{% endblock %}</h1>
+  <div id="content">
+      {% block content %}
+      {% endblock %}
+  </div>
+  <div id="sidebar">
+    {% block sidebar %}
+    {% endblock %}
+  </div>
+  {% block extra_content %}
+  {% endblock %}
+  </div>
+
+  <footer>
+    <p id="copyright">Written by <a href="https://github.com/django-de/djangosnippets.org/graphs/contributors">Felix Ma</a>. Hosted by <a href="https://www.heroku.com" class="heroku">Heroku</a>, powered by <a href="http://www.djangoproject.com/">Django</a></p>
+    <p class="legal"><a href="/about/">About</a> | <a href="/about/faq/">FAQ</a> | <a href="/about/tos/">Terms of service</a> | <a href="/about/legal/">Legal notices</a></p>
+  </footer>
+  {% block extra_body %}{% endblock %}
+  {% block extra_scripts %}{% endblock %}
+</body>
+</html>

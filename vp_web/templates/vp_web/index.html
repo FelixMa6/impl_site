@@ -1,0 +1,73 @@
+{% extends "vp_web/base_site.html" %}
+{% load i18n static %}
+
+{% block extrastyle %}
+
+<style type="text/css">
+</style>
+
+{{ block.super }}
+<link rel="stylesheet" type="text/css" href="{% static "vp_web/css/dashboard.css" %}" />
+
+{% endblock %}
+
+{% if not is_popup %}
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+<a href="{% url 'vp_web:index' %}">{% trans 'Home' %}</a>
+&rsaquo; <a href="{% url 'vp_web:index' %}">vp_web</a>
+</div>
+{% endblock %}
+{% endif %}
+
+{% block coltype %}colMS{% endblock %}
+
+{% block bodyclass %}{{ block.super }} dashboard{% endblock %}
+
+{% block content %}
+
+
+   <div class="com_status">
+    <table>
+    <caption>VP summary</caption>
+     <thead>
+	    <tr>
+            {% for item in com_status_header %}
+		    <th scope="col" class="sortable column-type">
+		    <div class="clear">{{ item }}</div>
+            </th>
+            {% endfor %}
+	    </tr>
+    </thead>
+    <tbody>
+        {% for item in com_status %}
+
+	    <tr class="{% cycle 'row1' 'row2' %}">
+            <td><a href={% url 'vp_web:component' item.pk %}>{{ item.component}}</a></td>
+            <td>{{ item.all_task}}</td>
+            <td>{{ item.finished_task}}</td>
+            <td>{{ item.finished_status}}</td>
+	    </tr>
+        {% endfor %}
+	</tbody>
+    </table>
+    </div>
+
+<HR style="FILTER: alpha(opacity=100,finishopacity=0,style=2)" width="100%" color=#417690 SIZE=3>
+
+{% if user.is_active %}
+<div id="pending_task"><h2><a href="{% url 'vp_web:index_status' user.id %}">pending task</a></h2></div>
+{% endif %}
+
+{% endblock %}
+
+{% block sidebar %}
+
+{% endblock %}
+
+    {% block footer %}
+      <div id="footer">
+    <p id="copyright">Written by <a href="">Felix Ma</a>. Hosted by <a href="https://www.deephi.com" class="deephi">DeePhi</a>, powered by <a href="http://www.djangoproject.com/">Django</a></p>
+    <p class="legal"><a href={% url 'vp_web:about' %}>About</a> | <a href="/about/faq/">FAQ</a> | <a href="/about/tos/">Terms of service</a> | <a href="/about/legal/">Legal notices</a></p>
+  </div>
+  {% endblock %}

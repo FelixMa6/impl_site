@@ -1,0 +1,72 @@
+{% extends "vp_web/base_site.html" %}
+{% load i18n static %}
+
+{% block extrastyle %}
+  {{ block.super }}
+  <link rel="stylesheet" type="text/css" href="{% static "vp_web/css/changelists.css" %}" />
+    <link rel="stylesheet" type="text/css" href="{% static "vp_web/css/forms.css" %}" />
+  {{ media.css }}
+  {% if not actions_on_top and not actions_on_bottom %}
+    <style>
+      #changelist table thead th:first-child {width: inherit}
+    </style>
+  {% endif %}
+{% endblock %}
+
+{% block extrahead %}
+{{ block.super }}
+{{ media.js }}
+{% endblock %}
+
+
+{% if not is_popup %}
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+<a href="{% url 'vp_web:index' %}">{% trans 'Home' %}</a>
+&rsaquo; <a href="{% url 'vp_web:component' component.id %}">Component</a>
+&rsaquo; {{ component.name|capfirst }}
+</div>
+{% endblock %}
+{% endif %}
+
+{% block coltype %}flex{% endblock %}
+
+{% block content %}
+    <form id="changelist-form" method="post" enctype="multipart/form-data" novalidate>{% csrf_token %}
+    <div class="add_feature">
+    <ul>
+    <li>
+    <a href="{% url 'vp_web:add_feature' component.id %}" class="addlink">Add feature type</a>
+    </li>    
+    </ul>
+    </div>
+
+    {% if results %}
+    <div class="com_status">
+    <table id="result_list">
+	<caption>
+	    {{component.name}}
+    </caption>
+	<thead>
+	    <tr>
+		{% for header in heads %}
+		<th scope="col" class="sortable column-type">
+		<div class="text">{{ header |capfirst }}</div>
+		<div class="clear"></div>
+		</th>{% endfor %}
+	    </tr>
+	</thead>
+	<tbody>
+	    {% for result in results %}
+		<tr class="{% cycle 'row1' 'row2' %}">{% for item in result %}{{ item }}{% endfor %}</tr>
+	    {% endfor %}
+	</tbody>
+    </table>
+    </div>
+    {% else %}
+        <p class="errornote">There is no verification Feature</p>
+    {% endif %}
+
+
+    </form>
+{% endblock %}

@@ -1,0 +1,69 @@
+{% extends "release_check/base_site.html" %}
+{% load i18n static %}
+
+{% block extrastyle %}
+    <style type="text/css">
+    </style>
+
+  {{ block.super }}
+  <link rel="stylesheet" type="text/css" href="{% static "release_check/css/dashboard.css" %}" />
+  <link rel="stylesheet" type="text/css" href="{% static "release_check/css/tablestyle.css" %}" />
+
+{% endblock %}
+
+{% if not is_popup %}
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+<a href="{% url 'release_check:index' %}">{% trans 'Home' %}</a>
+</div>
+{% endblock %}
+{% endif %}
+
+{% block content %}
+    <form id="changelist-form" method="post" enctype="multipart/form-data" novalidate>{% csrf_token %}
+
+    {% if errornote %}
+    <p class="errornote">
+        {{errornote}}
+    </p>
+    {% endif %}
+    
+
+    {% if infos %}
+
+    {% block field_sets %}
+    {% for fieldset in infos %}
+        {% include "release_check/includes/fieldset.html"%}
+    {% endfor %}
+    {% endblock %}
+
+    {% endif %}
+{#----------------------------------------------------------------------#}
+
+    <fieldset class="module aligned">
+    <div>
+    <table>
+    <caption>
+    <a >Fail info</a>
+    </caption>
+    <thead>
+        <tr>
+        {% for item in header %}
+        <th scope="col" class="sortable column-type" align="left">
+        <dir class="clear">{{ item }}</div>
+        </th>
+        {% endfor %}
+        </tr>
+    </thead>
+    <tbody>
+        {% for item in error_set %}
+
+        <tr class="{% cycle 'row1' 'row2' %}">
+            <th scope="row" text-align="left"><font color="#417690">{{item.owner}}</font></th>
+            <td maxlength="900">{{ item.line }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+    </table>
+    </form>
+{% endblock %}

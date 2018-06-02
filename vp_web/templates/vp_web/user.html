@@ -1,0 +1,59 @@
+{% extends "vp_web/base_site.html" %}
+{% load i18n static vrg_list %}
+
+{% block extrastyle %}
+  {{ block.super }}
+  <link rel="stylesheet" type="text/css" href="{% static "vp_web/css/changelists.css" %}" />
+    <link rel="stylesheet" type="text/css" href="{% static "vp_web/css/forms.css" %}" />
+  {{ media.css }}
+  {% if not actions_on_top and not actions_on_bottom %}
+    <style>
+      #changelist table thead th:first-child {width: inherit}
+    </style>
+  {% endif %}
+{% endblock %}
+
+{% block extrahead %}
+{{ block.super }}
+{{ media.js }}
+{% endblock %}
+
+
+{% if not is_popup %}
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+<a href="{% url 'vp_web:index' %}">{% trans 'Home' %}</a>
+&rsaquo; <a href="{% url 'vp_web:user' owner.id %}">User</a>
+&rsaquo; {{ owner.username|capfirst }}
+</div>
+{% endblock %}
+{% endif %}
+
+{% block coltype %}flex{% endblock %}
+
+{% block content %}
+    <form id="changelist-form" method="post" enctype="multipart/form-data" novalidate>{% csrf_token %}
+    <div class="results">
+    <table id="result_list">
+	<thead>
+	    <tr>
+		{% for header in result_headers %}
+		<th scope="col" class="sortable column-type">
+		<div class="text">{{ header.text|capfirst }}</div>
+		<div class="clear"></div>
+		</th>{% endfor %}
+	    </tr>
+	</thead>
+{% if results %}
+	<tbody>
+	    {% for result in results %}
+		<tr class="{% cycle 'row1' 'row2' %}">{% for item in result %}{{ item }}{% endfor %}</tr>
+	    {% endfor %}
+	</tbody>
+    </table>
+    </div>
+{% endif %}
+
+
+    </form>
+{% endblock %}

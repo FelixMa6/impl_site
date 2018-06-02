@@ -1,0 +1,38 @@
+<fieldset class="module aligned {{ fieldset.classes }}">
+    {% if fieldset.name %}<h2>{{ fieldset.name }}</h2>{% endif %}
+    {% if fieldset.description %}
+        <div class="description">{{ fieldset.description|safe }}</div>
+    {% endif %}
+    {% if not fieldset.editable %}
+    <table>
+    {% for field in fieldset.fields %}
+        <tr class="model-{{ field.name|lower }}">
+        <th scope="row">{{field.name|capfirst}}:</th>
+	    <td>{{ field.content }}</td>
+	</tr>
+    {% endfor %}
+    </table>
+    {% else %}
+        {% for field in fieldset.fields %}
+            <div class="form-row field-type">
+            {% if field.is_checkbox %}
+            <div class="checkbox-row">
+                <input {% if field.value %} checked="checked" {% endif %} id="id_{{field.name}}" name="{{field.name}}" type="checkbox" /><label class="vCheckboxLabel" for="id_{{field.name}}">{{field.content}}</label>
+            </div>
+            {% elif field.is_select %}
+            <div>
+            <label class="required" for="id_{{field.name}}">{{field.name|capfirst}}:</label>
+            <select id="id_{{field.name}}" name="{{field.name}}" required>
+                {{field.content}}
+            </select>
+            </div>
+            {% else %}
+            <div>
+            <label class="required" for="id_{{field.name}}">{{field.name|capfirst}}:</label>
+                {{field.content|safe}} {{field.comment}}
+            </div>
+            {% endif %}
+            </div>
+        {% endfor %}
+    {% endif %}
+</fieldset>

@@ -1,0 +1,134 @@
+{% extends "vp_web/base_site.html" %}
+{% load i18n static %}
+
+{% block extrastyle %}
+  {{ block.super }}
+  <link rel="stylesheet" type="text/css" href="{% static "vp_web/css/changelists.css" %}" />
+  <link rel="stylesheet" type="text/css" href="{% static "vp_web/css/forms.css" %}" />
+  {{ media.css }}
+  {% if not actions_on_top and not actions_on_bottom %}
+    <style>
+      #changelist table thead th:first-child {width: inherit}
+    </style>
+  {% endif %}
+{% endblock %}
+
+{% block extrahead %}
+{{ block.super }}
+{{ media.js }}
+{% endblock %}
+
+
+{% if not is_popup %}
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+<a href="{% url 'vp_web:index' %}">{% trans 'Home' %}</a>
+</div>
+{% endblock %}
+{% endif %}
+
+{% block coltype %}flex{% endblock %}
+
+{% block content %}
+
+<HR style="FILTER: alpha(opacity=100,finishopacity=0,style=2)" width="100%" color=#417690 SIZE=3>
+
+    <div class="results">
+        <h2>coverage trace result</h2>
+    <table id="result_list">
+	<thead>
+	    <tr>
+		<th scope="col" class="sortable column-type">
+		<div class="text">Index</div>
+		<div class="clear"></div>
+		</th>
+		<th scope="col" class="sortable column-type">
+		<div class="text">Feature Type</div>
+		<div class="clear"></div>
+        </th>
+		<th scope="col" class="sortable column-type">
+		<div class="text">Feature Point</div>
+		<div class="clear"></div>
+        </th>
+		<th scope="col" class="sortable column-type">
+		<div class="text">Stimulus name</div>
+		<div class="clear"></div>
+        </th>
+        <th scope="col" class="sortable column-type">
+		<div class="text">Stimulus status</div>
+		<div class="clear"></div>
+		</th>
+        <th scope="col" class="sortable column-type">
+		<div class="text">vrg_register_status</div>
+		<div class="clear"></div>
+        </th>
+        <th scope="col" class="sortable column-type">
+		<div class="text">stimulus_random_status</div>
+		<div class="clear"></div>
+        </th>
+        <th scope="col" class="sortable column-type">
+		<div class="text">Stimulus_owner</div>
+		<div class="clear"></div>
+        </th>
+		<th scope="col" class="sortable column-type">
+		<div class="text">Cover_count</div>
+		<div class="clear"></div>
+		</th>
+	    </tr>
+	</thead>
+	<tbody>
+	    {% for feature in features %}
+	    <tr class="{% cycle 'row1' 'row2' %}">
+		<td>{{forloop.counter}}</td>
+        <td><a href={% url 'vp_web:feature' feature.feature.id %}>{{feature.feature.name}}</a></td>
+        <td><a href={% url 'vp_web:point' feature.id %}>{{feature.name}}</a></td>
+		<td>{{feature.stimulus_single}}</td>
+
+        {% if feature.get_stimulus_status_display == '100%' %}
+		    <td>{{feature.get_stimulus_status_display}}</td>
+        {% else %}
+            <td bgcolor="#E6B0AA"><font color="#6A1E16">{{feature.get_stimulus_status_display}}</font></td>
+        {% endif %}
+
+        {% if feature.get_stimulus_status_display != '100%' or feature.get_vrg_register_status_display == 'registered' %}
+		    <td>{{feature.get_vrg_register_status_display}}</td>
+        {% else %}
+            <td bgcolor="#E6B0AA"><font color="#6A1E16">{{feature.get_vrg_register_status_display}}</font></td>
+        {% endif %}
+
+        {% if feature.get_stimulus_status_display != '100%' or feature.get_stimulus_covered_status_display == 'randomed' %}
+		    <td>{{feature.get_stimulus_covered_status_display}}</td>
+        {% else %}
+            <td bgcolor="#E6B0AA"><font color="#6A1E16">{{feature.get_stimulus_covered_status_display}}</font></td>
+        {% endif %}
+
+        {% if feature.get_stimulus_status_display != '100%' or feature.get_vrg_register_status_display != 'registered' %}
+		    <td bgcolor="#E6B0AA"><font color="#6A1E16">{{feature.stimulus_owner}}</font></td>
+        {% else %}
+		    <td>{{feature.stimulus_owner}}</td>
+        {% endif %}
+
+        {% if feature.vp_cover_count <= 20 %}
+		    <td bgcolor="#E6B0AA"><font color="#6A1E16">{{feature.vp_cover_count}}</font></td>
+        {% else %}
+		    <td>{{feature.vp_cover_count}}</td>
+        {% endif %}
+        {#{% if feature.get_check_way_status_display == '100%' %}#}
+        {#    <td bgcolor="#D6EAF8"><font color="#1B4F72">{{feature.get_check_way_status_display}}</font></td>#}
+        {#{% else %}#}
+		{#    <td>{{feature.get_check_way_status_display}}</td>#}
+        {#{% endif%}#}
+
+        {#<td>{{feature.add_time|date:"m-d" }}</td>#}
+	    </tr>
+	    {% endfor %}
+	</tbody>
+	</table>
+
+    </div>
+
+    
+
+
+
+{% endblock %}

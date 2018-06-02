@@ -1,0 +1,75 @@
+{% extends "signoff_check/base_site.html" %}
+{% load i18n static %}
+
+{% block extrastyle %}
+  {{ block.super }}
+  <link rel="stylesheet" type="text/css" href="{% static "signoff_check/css/changelists.css" %}" />
+  <link rel="stylesheet" type="text/css" href="{% static "signoff_check/css/forms.css" %}" />
+  {{ media.css }}
+  {% if not actions_on_top and not actions_on_bottom %}
+    <style>
+      #changelist table thead th:first-child {width: inherit}
+    </style>
+  {% endif %}
+{% endblock %}
+
+{% block extrahead %}
+{{ block.super }}
+{{ media.js }}
+{% endblock %}
+
+
+{% if not is_popup %}
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+<a href="{% url 'signoff_check:index' %}">{% trans 'Home' %}</a>
+</div>
+{% endblock %}
+{% endif %}
+
+{% block coltype %}flex{% endblock %}
+
+{% block content %}
+
+	<h2> PT multi corner result </h2>
+	<br> </br>
+
+{% for partition in partition_set %}
+   <div id="cross_check_summary" class="module">
+    <table>
+    <caption>
+        <a><b><big> {{partition}}</big></b></a>
+    </caption>
+     <thead>
+	    <tr>
+            {% for item in header %}
+		    <th scope="col" class="sortable column-type">
+		    <div class="clear">{{ item }}</div>
+            </th>
+            {% endfor %}
+	    </tr>
+    </thead>
+    <tbody>
+        {% for item in display_set %}
+        {% if item.partition == partition %}
+
+	    <tr class="{% cycle 'row1' 'row2' %}">
+            <th scope="row" text-align="left"><a href="{% url 'signoff_check:partition_status' partition=item.partition corner=item.corner %}"><font color="#417690">{{item.partition}}</font></a></th>
+            <td maxlength="200">{{ item.corner }}</td>
+            <td maxlength="200">{{ item.setup_wns }}</td>
+            <td maxlength="200">{{ item.setup_tns }}</td>
+            <td maxlength="200">{{ item.setup_nvp }}</td>
+            <td maxlength="200">{{ item.hold_wns }}</td>
+            <td maxlength="200">{{ item.hold_tns }}</td>
+            <td maxlength="200">{{ item.hold_nvp }}</td>
+            {#<td maxlength="200">{{ item.summit_time }}</td>#}
+            <td scope="row" text-align="left"><a href="{% url 'signoff_check:partition_status' partition=item.partition corner=item.corner %}"><font color="#417690">{{item.summit_time}}</font></a></td>
+	    </tr>
+        {% endif %}
+        {% endfor %}
+	</tbody>
+    </table>
+    </div>
+{% endfor %}
+
+{% endblock %}

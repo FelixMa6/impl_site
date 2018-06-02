@@ -1,0 +1,32 @@
+{% extends "release_check/base_site.html" %}
+{% load i18n static %}
+
+{% block extrastyle %}
+    <style type="text/css">
+    </style>
+
+  {{ block.super }}
+  <link rel="stylesheet" type="text/css" href="{% static "release_check/css/dashboard.css" %}" />
+  <link rel="stylesheet" type="text/css" href="{% static "release_check/css/tablestyle.css" %}" />
+
+{% endblock %}
+
+{% if not is_popup %}
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+<a href="{% url 'release_check:index' %}">{% trans 'Home' %}</a>
+</div>
+{% endblock %}
+{% endif %}
+
+{% block content %}
+    <div class="log_style">
+
+     <p><pre><font color="#17202a">
+        {% autoescape off%}
+        {{p|linebreaks|safe|escape}}
+        {% endautoescape %}
+        </font></pre></p>
+
+    </div>
+{% endblock %}

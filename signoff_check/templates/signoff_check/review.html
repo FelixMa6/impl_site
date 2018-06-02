@@ -1,0 +1,98 @@
+{% extends "signoff_check/base_site.html" %}
+{% load i18n static %}
+
+{% block extrastyle %}
+  {{ block.super }}
+  <link rel="stylesheet" type="text/css" href="{% static "signoff_check/css/changelists.css" %}" />
+  <link rel="stylesheet" type="text/css" href="{% static "signoff_check/css/forms.css" %}" />
+  {{ media.css }}
+  {% if not actions_on_top and not actions_on_bottom %}
+    <style>
+      #changelist table thead th:first-child {width: inherit}
+    </style>
+  {% endif %}
+{% endblock %}
+
+{% block extrahead %}
+{{ block.super }}
+{{ media.js }}
+{% endblock %}
+
+
+{% if not is_popup %}
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+<a href="{% url 'signoff_check:index' %}">{% trans 'Home' %}</a>
+</div>
+{% endblock %}
+{% endif %}
+
+{% block coltype %}flex{% endblock %}
+
+{% block content %}
+
+    <div class="results">
+    <h2>Pending Task</h2>
+    <table id="result_list">
+	<thead>
+	    <tr>
+		<th scope="col" class="sortable column-type">
+		<div class="text">Index</div>
+		<div class="clear"></div>
+		</th>
+		<th scope="col" class="sortable column-type">
+		<div class="text">Feature Type</div>
+		<div class="clear"></div>
+        </th>
+		<th scope="col" class="sortable column-type">
+		<div class="text">Feature Point</div>
+		<div class="clear"></div>
+        </th>
+        <th scope="col" class="sortable column-type">
+		<div class="text">Feature_tatus</div>
+		<div class="clear"></div>
+		</th>
+        <th scope="col" class="sortable column-type">
+		<div class="text">Cover_status</div>
+		<div class="clear"></div>
+		</th>
+        <th scope="col" class="sortable column-type">
+		<div class="text">Stimulus_status</div>
+		<div class="clear"></div>
+		</th>
+        <th scope="col" class="sortable column-type">
+		<div class="text">Check_way_status</div>
+		<div class="clear"></div>
+		</th>
+		<th scope="col" class="sortable column-type">
+		<div class="text">Add time</div>
+		<div class="clear"></div>
+		</th>
+		<th scope="col" class="sortable column-type">
+		<div class="text">Modified time</div>
+		<div class="clear"></div>
+		</th>
+	    </tr>
+	</thead>
+	<tbody>
+	    {% for feature in features %}
+	    <tr class="{% cycle 'row1' 'row2' %}">
+		<td>{{forloop.counter}}</td>
+        <td><a href={% url 'signoff_check:feature' feature.feature.id %}>{{feature.feature.name}}</a></td>
+        <td><a href={% url 'signoff_check:point' feature.id %}>{{feature.name}}</a></td>
+		<td>{{feature.get_feature_status_display}}</td>
+		<td>{{feature.get_cover_status_display}}</td>
+		<td>{{feature.get_stimulus_status_display}}</td>
+		<td>{{feature.get_check_way_status_display}}</td>
+		<td>{{feature.add_time|date:"m-d" }}</td>
+		<td>{{feature.modified_time|date:"m-d" }}</td>
+	    </tr>
+	    {% endfor %}
+	</tbody>
+	</table>
+
+    </div>
+
+    
+
+{% endblock %}

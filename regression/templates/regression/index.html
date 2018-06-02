@@ -1,0 +1,392 @@
+{% extends "regression/base_site.html" %}
+{% load i18n static %}
+
+{% block extrastyle %}
+
+<style type="text/css">
+</style>
+
+{{ block.super }}
+<link rel="stylesheet" type="text/css" href="{% static "regression/css/dashboard.css" %}" />
+
+{% endblock %}
+
+{% if not is_popup %}
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+<a href="{% url 'vp_web:index' %}">{% trans 'Home' %}</a>
+&rsaquo; <a href="{% url 'regression:index' %}">regression</a>
+</div>
+{% endblock %}
+{% endif %}
+
+{% block coltype %}colMS{% endblock %}
+
+{% block bodyclass %}{{ block.super }} dashboard{% endblock %}
+
+{% block content %}
+<div id="content-main">
+
+    <div id="owner" class="module">
+    {% if owner_list %}
+    <table>
+    <caption>
+	<a class="section" title="daily report information">Fail Reports</a>
+    </caption>
+    <thead>
+	    <tr>
+		<th scope="col" class="sortable column-type">
+            <div class="text"><a>Date</a></div>
+		</th>
+        {% for owner in	owners %}
+		<th scope="col" class="sortable column-type">
+            <div class="text"><a href="{% url 'regression:user' owner.id %}"><font color="#417690">{{ owner.username }}</font></a></div>
+		<div class="clear"></div>
+        </th>
+        {% endfor %}
+	    </tr>
+    </thead>
+    <tbody>
+    {% for one_list in owner_list %}
+	    <tr class="{% cycle 'row1' 'row2' %}">
+	    {% for item in	one_list %}
+            {% if forloop.first %}
+                <th scope="row">{{ item }}</th>
+            {% else %}
+            {% if item > 150 %}
+                    <td bgcolor="#1F100A"><font color="#FBF0F0">{{ item }}</font></td>
+            {% elif item > 60 %}
+                    <td bgcolor="#7F100A"><font color="#FBF0F0">{{ item }}</font></td>
+            {% elif item > 6 %}
+                    <td bgcolor="#FF101A"><font color="#1B1010">{{ item }}</font></td>
+            {% elif item > 2 %}
+                    <td bgcolor="#FF945A"><font color="#8B1010">{{ item }}</font></td>
+                {% elif item %}
+                <td bgcolor="#B0E0E6"><font color="#8B1010">{{ item }}</font></td>
+                {% else %}
+                    <td>{{ item }}</td>
+                {% endif%}
+            {% endif %}
+	    {% endfor %}
+	    </tr>
+    {% endfor %}
+	</tbody>
+    </table>
+    {% endif %}
+    </div>
+</div>
+
+<HR style="FILTER: alpha(opacity=100,finishopacity=0,style=2)" width="100%" color=#417690 SIZE=3>
+
+    <div id="report" class="module">
+    {% if daily_reports %}
+    <table>
+    <caption>
+	<a class="section" title="daily report information">Pass Rate</a>
+    </caption>
+     <thead>
+	    <tr>
+            {% for item in daily_header %}
+		    <th scope="col" class="sortable column-type">
+                <div class="text"><a>{{ item }}</a></div>
+		    <div class="clear"></div>
+            </th>
+            {% endfor %}
+	    </tr>
+    </thead>
+    <tbody>
+        {% for daily_report in daily_reports %}
+
+	    <tr class="{% cycle 'row1' 'row2' %}">
+        {% for item in daily_report %}
+        {% if forloop.first %}
+	        <th scope="row">{{item.content}}</th>
+        {% else %}
+            <td>{{ item.content }}</td>
+        {% endif %}
+        {% endfor %}
+	    </tr>
+        {% endfor %}
+	</tbody>
+    </table>
+    {% else %}
+    <h2> NO VRG DATA </h2>
+    {% endif %}
+    </div>
+
+<HR style="FILTER: alpha(opacity=100,finishopacity=0,style=2)" width="100%" color=#417690 SIZE=3>
+
+<div id="main_2">
+   <div class="app-users module">
+    {% if daily_report %}
+    <table>
+    <caption>
+	<a class="section" title="Daily report information">Transaction Report</a>
+    </caption>
+	{% for item in daily_report %}
+	<tr class="model-{{ item.name|lower }}">
+	    <th scope="row">{{ item.name }}</th>
+	    <td>{{ item.counter }}</td>
+	</tr>
+	{% endfor %}
+
+    </table>
+    {% else %}
+    <h2> NO VRG DATA </h2>
+    {% endif %}
+    </div>
+
+</div>
+
+<HR style="FILTER: alpha(opacity=100,finishopacity=0,style=2)" width="100%" color=#417690 SIZE=3>
+
+<!--<HR style="FILTER: alpha(opacity=100,finishopacity=0,style=2)" width="100%" color=#417690 SIZE=3>
+-->
+
+    <!--<HR style="FILTER: alpha(opacity=100,finishopacity=0,style=2)" width="100%" color=#417690 SIZE=3>-->
+<div id="main_1"></div>
+   <script type="text/javascript" src="{% static "vp_web/js/echarts.js" %}"></script>
+    <script type="text/javascript">
+        var myChart = echarts.init(document.getElementById('main_1'));
+        var dates = [];
+        var pass_numbers = [];
+        var fail_numbers = [];
+        var pass_rates = [];
+        {% for report in reports %}
+            dates.push('{{ report.end_day |date:"m-d" }}');
+            pass_numbers.push({{ report.pass_number }});
+            fail_numbers.push({{ report.fail_number }});
+            pass_rates.push(({{report.pass_number}}*100.0/({{report.pass_number}}+{{report.fail_number}})).toFixed(2));
+        {% endfor %}
+        myChart.setOption({
+            title : {
+              text:'Pass Rate Change',
+              x:'above',
+            },
+
+            tooltip : {
+                trigger: 'axis',
+                },
+            calculable :  true,
+            legend: {
+                data:['pass','fail','pass rate'],
+                x:'right',
+                },
+            xAxis : [
+                {
+                    type : 'category',
+                    data : dates,
+                }
+            ],
+            yAxis : [
+                {
+                    type : 'value',
+                    name : 'percent',
+                    axisLabel : {
+                        formatter: '{value}%'
+                    }
+                },
+                {
+                    type : 'value',
+                    name : 'number',
+                    axisLabel : {
+                        formatter: '{value}'
+                    }
+                },
+            ],
+            series : [
+            {
+                name:'pass',
+                type:'bar',
+                yAxisIndex:1,
+                data : pass_numbers,
+            },
+            {
+                name:'fail',
+                type:'bar',
+                yAxisIndex:1,
+                data : fail_numbers,
+            },
+            {
+                name:'pass rate',
+                type:'line',
+                data : pass_rates,
+            },
+                ]
+                            });
+
+    </script>
+
+<div id="main_3"></div>
+  <script type="text/javascript" src="{% static "regression/js/echarts.js" %}"></script>
+    <script type="text/javascript">
+        var myChart = echarts.init(document.getElementById('main_3'));
+        /*var labelBottom = {
+            normal : {
+                color : '#ccc',
+                label : {
+                    show : true,
+                    position : 'center'
+                },
+                labelLine : {
+                    show : false
+                }
+            },
+            emphasis : {
+                color : 'rgba(0,0,0,0)'
+            }
+        };*/
+        var radius = ['18.54%','30%'];
+        myChart.setOption( {
+            title : {
+                text : 'Generic Information',
+                x: 'center'
+            },  
+            tooltip : {
+                trigger:'item',
+                formatter: "{a}<br />{b} : {c}"
+            },
+            legend: {
+            orient:'vertical',
+            x :'right',
+            y :'20%',
+            data:[
+                {% for item in lengends %}
+                        '{{item}}',
+                {% endfor %}
+
+                ],
+            },
+            series : [
+                {
+                    type   : 'pie',
+                    name : 'request',
+                    center : ['25%','25%'],
+                    x: '0%',
+                    radius : radius,
+                    data : [
+                            {% for item in transactions %}
+                                {name:'{{item.name}}',value:{{item.counter}}},
+                            {% endfor %}
+                        ],
+                },
+                {
+                    type   : 'pie',
+                    name   : 'c2p',
+                    center : ['65%','25%'],
+                    radius : radius,
+                    x: '25%',
+                    data : [
+                            {% for item in c2ps %}
+                                {name:'{{item.name}}',value:{{item.counter}}},
+                            {% endfor %}
+                        ],
+                },
+                {
+                    type   : 'pie',
+                    name   : 'interrupt',
+                    center : ['25%','75%'],
+                    radius : radius,
+                    x: '50%',
+                    data : [
+                            {% for item in ints %}
+                                {name:'{{item.name}}',value:{{item.counter}}},
+                            {% endfor %}
+                        ],
+                },
+                {
+                    type   : 'pie',
+                    center : ['65%','75%'],
+                    name   : 'other',
+                    radius : radius,
+                    x: '75%',
+                    data : [
+                            {% for item in others %}
+                                {name:'{{item.name}}',value:{{item.counter}}},
+                            {% endfor %}
+                        ],
+                },
+             ]
+        });
+    </script>
+
+
+<div id="main"></div>
+    <script type="text/javascript" src="{% static "regression/js/echarts.js" %}"></script>
+    <script type="text/javascript">
+        var myChart = echarts.init(document.getElementById('main'));
+        var tags = [];
+        var contents = [];
+        myChart.showLoading({
+                text:'data is loading...'
+                })
+        {% for type in distribution %}
+            tags.push('{{type.name}}');
+            contents.push({value:{{type.counter}},name:'{{type.name}}'})
+        {% endfor %}  
+
+        myChart.setOption({
+            title : {
+              text:'Fail Distribution',
+              x:'above',
+            },
+        tooltip: {
+            trigger:'item',
+            formatter: "{a} <br/>{b} : {c} ({d}%)"
+            },
+        legend: {
+            orient:'vertical',
+            x:'right',
+            data:tags,
+            },
+            calculable:true,
+            series:[
+                {
+                    name : 'Fail Distribution',
+                    type : 'pie',
+                    radius : '55%',
+                    center: ['40%','50%'],
+                    data:contents,
+                }
+                ]
+                });
+        myChart.hideLoading();
+    </script>
+
+
+<HR style="FILTER: alpha(opacity=100,finishopacity=0,style=2)" width="100%" color=#417690 SIZE=3>
+
+{% endblock %}
+
+{% block sidebar %}
+<div id="content-related">
+<!--
+<script src="{% static "regression/js/jquery.min.js" %}"></script>
+<script type="text/javascript" src="{% static "regression/js/pieChart.js" %}"></script>
+<script src="/gg_bd_ad_720x90.js" type="text/javascript"></script>
+<script src="/follow.js" type="text/javascript"></script>
+</div>
+<div id="container">
+    <table id="chartData">
+        <caption>BUG Distribution</caption>
+            <tr>
+				<th>TYPE</th><th>Number</th>
+			</tr>
+            {% for type in distribution %}
+            <tr style="color:{{type.color}}">
+                <td>{{type.name}}</td><td>{{type.counter}}</td>
+			</tr>
+            {% endfor %}
+		</table>
+		<canvas id="chart" width="500" height="500"></canvas>
+    </div>
+    --!>
+</div>
+{% endblock %}
+
+    {% block foter %}
+      <div id="footer">
+    <p id="copyright">Written by <a href="">Felix Ma</a>. Hosted by <a href="https://www.deephi.com" class="deephi">DeePhi</a>, powered by <a href="http://www.djangoproject.com/">Django</a></p>
+    <p class="legal"><a href={% url 'vp_web:about' %}>About</a> | <a href="/about/faq/">FAQ</a> | <a href="/about/tos/">Terms of service</a> | <a href="/about/legal/">Legal notices</a></p>
+  </div>
+  {% endblock %}

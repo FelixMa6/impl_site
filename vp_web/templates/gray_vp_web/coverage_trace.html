@@ -1,0 +1,199 @@
+{% extends "vp_web/base_site.html" %}
+{% load i18n static %}
+
+{% block extrastyle %}
+  {{ block.super }}
+  <link rel="stylesheet" type="text/css" href="{% static "vp_web/css/changelists.css" %}" />
+  <link rel="stylesheet" type="text/css" href="{% static "vp_web/css/forms.css" %}" />
+  {{ media.css }}
+  {% if not actions_on_top and not actions_on_bottom %}
+    <style>
+      #changelist table thead th:first-child {width: inherit}
+    </style>
+  {% endif %}
+{% endblock %}
+
+{% block extrahead %}
+{{ block.super }}
+{{ media.js }}
+{% endblock %}
+
+
+{% if not is_popup %}
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+<a href="{% url 'vp_web:index' %}">{% trans 'Home' %}</a>
+</div>
+{% endblock %}
+{% endif %}
+
+{% block coltype %}flex{% endblock %}
+
+{% block content %}
+
+<HR style="FILTER: alpha(opacity=100,finishopacity=0,style=2)" width="100%" color=#417690 SIZE=3>
+
+<div>
+        <p> {{publish_date}} </p>
+        <h2> Feature coverage result </h2>
+    <table>
+    <caption>
+    </caption>
+     <thead>
+	    <tr>
+            {% for item in status_header %}
+		    <th scope="col" class="sortable column-type">
+		    <div class="clear">{{ item }}</div>
+            </th>
+            {% endfor %}
+	    </tr>
+    </thead>
+    <tbody>
+        {% for item in status_list %}
+
+	    <tr class="{% cycle 'row1' 'row2' %}">
+	        <th scope="row" text-align="left"><font color="#417690">{{item.num}}</font></th>
+            {#<td maxlength="200"><a href="{% url 'vp_web:point' pk=item.pk %}"><font color="#417690">{{ item.pk}}</font></a></td>#}
+            <td maxlength="200">{{ item.module}}</td>
+            <td maxlength="200">{{ item.coverage}}</td>
+            <td maxlength="200">{{ item.status}}</td>
+	    </tr>
+        {% endfor %}
+	</tbody>
+    </table>
+    </div>
+
+<HR style="FILTER: alpha(opacity=100,finishopacity=0,style=2)" width="100%" color=#417690 SIZE=3>
+
+    <div class="results">
+        <h2>coverage trace result</h2>
+    <table id="result_list">
+	<thead>
+	    <tr>
+		<th scope="col" class="sortable column-type">
+		<div class="text">Index</div>
+		<div class="clear"></div>
+        </th>
+		<th scope="col" class="sortable column-type">
+		<div class="text">Feature Type</div>
+		<div class="clear"></div>
+        </th>
+		<th scope="col" class="sortable column-type">
+		<div class="text">Feature Point</div>
+		<div class="clear"></div>
+        </th>
+    	<th scope="col" class="sortable column-type">
+		<div class="text">Cover Sva Name</div>
+		<div class="clear"></div>
+		</th>
+		<th scope="col" class="sortable column-type">
+		<div class="text">Stimulus name</div>
+		<div class="clear"></div>
+        </th>
+        <th scope="col" class="sortable column-type">
+		<div class="text">Stimulus status</div>
+		<div class="clear"></div>
+		</th>
+        <th scope="col" class="sortable column-type">
+		<div class="text">vrg_register_status</div>
+		<div class="clear"></div>
+        </th>
+        <th scope="col" class="sortable column-type">
+		<div class="text">stimulus_random_status</div>
+		<div class="clear"></div>
+        </th>
+        <th scope="col" class="sortable column-type">
+		<div class="text">Stimulus_owner</div>
+		<div class="clear"></div>
+        </th>
+		<th scope="col" class="sortable column-type">
+		<div class="text">Cover_sva_owner</div>
+		<div class="clear"></div>
+		</th>
+	    </tr>
+	</thead>
+	<tbody>
+	    {% for element in set %}
+	    <tr class="{% cycle 'row1' 'row2' %}">
+		<td>{{forloop.counter}}</td>
+
+        <td><a href={% url 'vp_web:feature' element.vp.feature.id %}>{{element.vp.feature.name}}</a></td>
+        <td><a href={% url 'vp_web:point' element.vp.id %}>{{element.vp.name}}</a></td>
+		<td>{{element.cover_sva_name}}</td>
+		<td>{{element.vp.stimulus_single}}</td>
+
+        {% if element.vp.get_stimulus_status_display == '100%' %}
+		    <td>{{element.vp.get_stimulus_status_display}}</td>
+        {% else %}
+            <td bgcolor="#E6B0AA"><font color="#6A1E16">{{element.vp.get_stimulus_status_display}}</font></td>
+        {% endif %}
+
+        {% if element.vp.get_stimulus_status_display != '100%' or element.vp.get_vrg_register_status_display == 'registered' %}
+		    <td>{{element.vp.get_vrg_register_status_display}}</td>
+        {% else %}
+            <td bgcolor="#E6B0AA"><font color="#6A1E16">{{element.vp.get_vrg_register_status_display}}</font></td>
+        {% endif %}
+
+        {% if element.vp.get_stimulus_status_display != '100%' or element.vp.get_stimulus_covered_status_display == 'randomed' %}
+		    <td>{{element.vp.get_stimulus_covered_status_display}}</td>
+        {% else %}
+            <td bgcolor="#E6B0AA"><font color="#6A1E16">{{element.vp.get_stimulus_covered_status_display}}</font></td>
+        {% endif %}
+
+        {% if element.vp.get_stimulus_status_display != '100%' or element.vp.get_vrg_register_status_display != 'registered' %}
+		    <td bgcolor="#E6B0AA"><font color="#6A1E16">{{element.vp.stimulus_owner}}</font></td>
+        {% else %}
+		    <td>{{element.vp.stimulus_owner}}</td>
+        {% endif %}
+
+        {% if element.vp.get_stimulus_status_display == '100%' and element.vp.get_vrg_register_status_display == 'registered' and element.vp.get_stimulus_covered_status_display == 'randomed' %}
+		    <td bgcolor="#E6B0AA"><font color="#6A1E16">{{element.vp.cover_sva_owner}}</font></td>
+        {% else %}
+		    <td>{{element.vp.cover_sva_owner}}</td>
+        {% endif %}
+        {#{% if element.vp.get_check_way_status_display == '100%' %}#}
+        {#    <td bgcolor="#D6EAF8"><font color="#1B4F72">{{element.vp.get_check_way_status_display}}</font></td>#}
+        {#{% else %}#}
+		{#    <td>{{element.vp.get_check_way_status_display}}</td>#}
+        {#{% endif%}#}
+
+        {#<td>{{element.vp.add_time|date:"m-d" }}</td>#}
+	    </tr>
+	    {% endfor %}
+	</tbody>
+	</table>
+
+    </div>
+
+    
+<HR style="FILTER: alpha(opacity=100,finishopacity=0,style=2)" width="100%" color=#417690 SIZE=3>
+
+<div>
+        <h2> Cover sva not found in VP web </h2>
+    <table>
+    <caption>
+    </caption>
+     <thead>
+	    <tr>
+            {% for item in header %}
+		    <th scope="col" class="sortable column-type">
+		    <div class="clear">{{ item }}</div>
+            </th>
+            {% endfor %}
+	    </tr>
+    </thead>
+    <tbody>
+        {% for item in unexisted_cover_sva_list %}
+
+	    <tr class="{% cycle 'row1' 'row2' %}">
+	        <th scope="row" text-align="left"><font color="#417690">{{item.num}}</font></th>
+            {#<td maxlength="200"><a href="{% url 'vp_web:point' pk=item.pk %}"><font color="#417690">{{ item.pk}}</font></a></td>#}
+            <td maxlength="200">{{ item.cover_sva_name}}</td>
+	    </tr>
+        {% endfor %}
+	</tbody>
+    </table>
+    </div>
+
+
+{% endblock %}

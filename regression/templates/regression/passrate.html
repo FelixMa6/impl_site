@@ -1,0 +1,99 @@
+{% extends "regression/base_site.html" %}
+{% load i18n static %}
+
+{% block extrastyle %}
+
+<style type="text/css">
+</style>
+
+{{ block.super }}
+<link rel="stylesheet" type="text/css" href="{% static "regression/css/dashboard.css" %}" />
+
+{% endblock %}
+
+
+
+{% block coltype %}colMS{% endblock %}
+
+{% block bodyclass %}{{ block.super }} dashboard{% endblock %}
+
+{% block breadcrumbs %}{% endblock %}
+
+{% block content %}
+
+<div id="main"></div>
+    <script type="text/javascript" src="{% static "regression/js/echarts.js" %}"></script>
+    <script type="text/javascript">
+        var myChart = echarts.init(document.getElementById('main'));
+        var dates = [];
+        var pass_numbers = [];
+        var fail_numbers = [];
+        var pass_rates = [];
+        {% for report in reports %}
+            dates.push('{{ report.end_day |date:"m-d" }}');
+            pass_numbers.push({{ report.pass_number }});
+            fail_numbers.push({{ report.fail_number }});
+            pass_rates.push(({{report.pass_number}}*100.0/({{report.pass_number}}+{{report.fail_number}})).toFixed(2));
+        {% endfor %}
+        myChart.setOption({
+            tooltip : {
+                trigger: 'axis',
+                },
+            calculable :  true,
+            legend: {
+                data:['pass','fail','pass rate']
+                },
+            xAxis : [
+                {
+                    type : 'category',
+                    data : dates,
+                }
+            ],
+            yAxis : [
+                {
+                    type : 'value',
+                    name : 'percent',
+                    axisLabel : {
+                        formatter: '{value}%'
+                    }
+                },
+                {
+                    type : 'value',
+                    name : 'number',
+                    axisLabel : {
+                        formatter: '{value}'
+                    }
+                },
+            ],
+            series : [
+            {
+                name:'pass',
+                type:'bar',
+                yAxisIndex:1,
+                data : pass_numbers,
+            },
+            {
+                name:'fail',
+                type:'bar',
+                yAxisIndex:1,
+                data : fail_numbers,
+            },
+            {
+                name:'pass rate',
+                type:'line',
+                data : pass_rates,
+            },
+                ]
+                            });
+
+    </script>
+</div>
+
+
+
+{% endblock %}
+
+{% block sidebar %}
+<div id="content-related">
+</div>
+{% endblock %}

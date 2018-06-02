@@ -1,0 +1,12 @@
+<fieldset class="design_info">
+    {% if fieldset.nam %}<h2>{{ fieldset.name }}</h2>{% endif %}
+    <table>
+    {% for field in fieldset.fields %}
+        <tr class="model-{{ field.name|lower }}">
+        <th scope="row">{{field.name|capfirst}}:</th>
+        <td align="left">{{ field.content }}</td>
+        </tr>
+    {% endfor %}
+    </table>
+</fieldset>
+

@@ -1,0 +1,147 @@
+{% extends "regression/base_site.html" %}
+{% load i18n static %}
+
+{% block extrastyle %}
+
+<style type="text/css">
+</style>
+
+{{ block.super }}
+<link rel="stylesheet" type="text/css" href="{% static "regression/css/dashboard.css" %}" />
+
+{% endblock %}
+
+
+
+{% block coltype %}colMS{% endblock %}
+
+{% block bodyclass %}{{ block.super }} dashboard{% endblock %}
+
+{% block breadcrumbs %}{% endblock %}
+
+{% block content %}
+<div id="content-main">
+
+    <div class="app-users module">
+    {% if daily_report %}
+    <table>
+    <caption>
+	<a class="section" title="daily report information">TODAY</a>
+    </caption>
+	{% for item in daily_report %}
+	<tr class="model-{{ item.name|lower }}">
+	    <th scope="row">{{ item.name }}</th>
+	    <td>{{ item.counter }}</td>
+	</tr>
+	{% endfor %}
+
+    </table>
+    {% else %}
+    <h2> NO VRG DATA </h2>
+    {% endif %}
+</div>
+</div>
+
+
+<div id="main"></div>
+    <script type="text/javascript" src="{% static "regression/js/echarts.js" %}"></script>
+    <script type="text/javascript">
+        var myChart = echarts.init(document.getElementById('main'));
+        /*var labelBottom = {
+            normal : {
+                color : '#ccc',
+                label : {
+                    show : true,
+                    position : 'center'
+                },
+                labelLine : {
+                    show : false
+                }
+            },
+            emphasis : {
+                color : 'rgba(0,0,0,0)'
+            }
+        };*/
+        var radius = ['18.54%','30%'];
+        myChart.setOption( {
+            title : {
+                text : 'Generic Information',
+                x: 'center'
+            },  
+            tooltip : {
+                trigger:'item',
+                formatter: "{a}<br />{b} : {c}"
+            },
+            legend: {
+            orient:'vertical',
+            x :'right',
+            y :'20%',
+            data:[
+                {% for item in lengends %}
+                        '{{item}}',
+                {% endfor %}
+
+                ],
+            },
+            series : [
+                {
+                    type   : 'pie',
+                    name : 'request',
+                    center : ['25%','25%'],
+                    x: '0%',
+                    radius : radius,
+                    data : [
+                            {% for item in transactions %}
+                                {name:'{{item.name}}',value:{{item.counter}}},
+                            {% endfor %}
+                        ],
+                },
+                {
+                    type   : 'pie',
+                    name   : 'c2p',
+                    center : ['65%','25%'],
+                    radius : radius,
+                    x: '25%',
+                    data : [
+                            {% for item in c2ps %}
+                                {name:'{{item.name}}',value:{{item.counter}}},
+                            {% endfor %}
+                        ],
+                },
+                {
+                    type   : 'pie',
+                    name   : 'interrupt',
+                    center : ['25%','75%'],
+                    radius : radius,
+                    x: '50%',
+                    data : [
+                            {% for item in ints %}
+                                {name:'{{item.name}}',value:{{item.counter}}},
+                            {% endfor %}
+                        ],
+                },
+                {
+                    type   : 'pie',
+                    center : ['65%','75%'],
+                    name   : 'other',
+                    radius : radius,
+                    x: '75%',
+                    data : [
+                            {% for item in others %}
+                                {name:'{{item.name}}',value:{{item.counter}}},
+                            {% endfor %}
+                        ],
+                },
+             ]
+        });
+    </script>
+</div>
+
+
+
+{% endblock %}
+
+{% block sidebar %}
+<div id="content-related">
+</div>
+{% endblock %}

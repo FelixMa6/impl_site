@@ -1,0 +1,57 @@
+{% extends "vp_web/base_site.html" %}
+{% load i18n static %}
+
+{% block extrastyle %}
+
+<style type="text/css">
+</style>
+
+{{ block.super }}
+<link rel="stylesheet" type="text/css" href="{% static "vp_web/css/dashboard.css" %}" />
+<link rel="stylesheet" type="text/css" href="{% static "vp_web/css/tablestyle.css" %}" />
+
+{% endblock %}
+
+
+
+{% block coltype %}colMS{% endblock %}
+
+{% block bodyclass %}{{ block.super }} dashboard{% endblock %}
+
+{% block breadcrumbs %}{% endblock %}
+
+{% block content %}
+
+   <div class="com_status">
+    <table>
+    <caption>VP summary</caption>
+     <thead>
+	    <tr>
+            {% for item in com_status_header %}
+		    <th scope="col" class="sortable column-type">
+		    <div class="clear">{{ item }}</div>
+            </th>
+            {% endfor %}
+	    </tr>
+    </thead>
+    <tbody>
+        {% for item in com_status %}
+
+	    <tr class="{% cycle 'row1' 'row2' %}">
+            <td><a href={% url 'vp_web:component' item.pk %}>{{ item.component}}</a></td>
+            <td>{{ item.all_task}}</td>
+            <td>{{ item.finished_task}}</td>
+            <td>{{ item.finished_status}}</td>
+	    </tr>
+        {% endfor %}
+	</tbody>
+    </table>
+    </div>
+
+<HR style="FILTER: alpha(opacity=100,finishopacity=0,style=2)" width="100%" color=#417690 SIZE=3>
+
+{% endblock %}
+
+{% block sidebar %}
+
+{% endblock %}

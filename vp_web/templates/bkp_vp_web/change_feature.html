@@ -1,0 +1,60 @@
+{% extends "vp_web/base_site.html" %}
+{% load i18n static %}
+
+{% block extrastyle %}
+  {{ block.super }}
+  <link rel="stylesheet" type="text/css" href="{% static "vp_web/css/changelists.css" %}" />
+  <link rel="stylesheet" type="text/css" href="{% static "vp_web/css/forms.css" %}" />
+  {{ media.css }}
+  {% if not actions_on_top and not actions_on_bottom %}
+    <style>
+      #changelist table thead th:first-child {width: inherit}
+    </style>
+  {% endif %}
+{% endblock %}
+
+{% block extrahead %}
+{{ block.super }}
+{{ media.js }}
+{% endblock %}
+
+
+{% if not is_popup %}
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+<a href="{% url 'vp_web:index' %}">{% trans 'Home' %}</a>
+</div>
+{% endblock %}
+{% endif %}
+
+{% block coltype %}flex{% endblock %}
+
+{% block content %}
+    <form id="changelist-form" method="post" enctype="multipart/form-data" novalidate>{% csrf_token %}
+
+    {% if errornote %}
+    <p class="errornote">
+        {{errornote}}
+    </p>
+    {% endif %}
+
+    {% if infos %}
+    <div class="submit-row">
+        <input type="submit" value="Submit" class="default" name="_save" />
+    </div>
+
+    {% block field_sets %}
+    {% for fieldset in infos %}
+      {% include "vp_web/includes/fieldset.html" %}
+    {% endfor %}
+    {% endblock %}
+     <fieldset class="module aligned ">
+
+    <div class="submit-row">
+        <input type="submit" value="Submit" class="default" name="_save" />
+    </div>
+    {% endif %}
+    
+    </form>
+
+{% endblock %}

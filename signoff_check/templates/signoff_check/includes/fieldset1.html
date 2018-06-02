@@ -1,0 +1,12 @@
+<fieldset class="module aligned {{ fieldset.classes }}">
+    {% if fieldset.name %}<h2>{{ fieldset.name }}</h2>{% endif %}
+    <table>
+    {% for field in fieldset.fields %}
+        <tr class="{% cycle 'row1' 'row2' %} ">
+        <th scope="row">{{field.name|capfirst}}:</th>
+        <td align="left">{{ field.content }}</td>
+        </tr>
+    {% endfor %}
+    </table>
+</fieldset>
+

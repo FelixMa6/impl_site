@@ -1,0 +1,20 @@
+{% extends "vp_web/base.html" %}
+
+{% block title %}{{ title }} | {{ site_title|default:_('Django site admin') }}{% endblock %}
+
+{% block branding %}
+<h1 id="site-name"><a href="{% url 'vp_web:index' %}">verifcation tracking system </a></h1>
+{% endblock %}
+
+{% block navigation %}
+      <ul>
+        <li>
+          <a href="{% url 'vp_web:index' %}">Overview</a>
+        </li>
+        <li>
+          <a href="{% url 'vp_web:index' %}">Download</a>
+        </li>
+      </ul>
+{% endblock %}
+
+{% block nav-global %}{% endblock %}

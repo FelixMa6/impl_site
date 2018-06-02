@@ -1,0 +1,2865 @@
+Felix: The file is 404.html, num is 1 
+
+{% extends "admin/base_site.html" %}
+{% load i18n %}
+
+{% block title %}{% trans 'Page not found' %}{% endblock %}
+
+{% block content %}
+
+<h2>{% trans 'Page not found' %}</h2>
+
+<p>{% trans "We're sorry, but the requested page could not be found." %}</p>
+
+{% endblock %}
+Felix: The file is 500.html, num is 2 
+
+{% extends "admin/base_site.html" %}
+{% load i18n %}
+
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+<a href="{% url 'admin:index' %}">{% trans 'Home' %}</a>
+&rsaquo; {% trans 'Server error' %}
+</div>
+{% endblock %}
+
+{% block title %}{% trans 'Server error (500)' %}{% endblock %}
+
+{% block content %}
+<h1>{% trans 'Server Error <em>(500)</em>' %}</h1>
+<p>{% trans "There's been an error. It's been reported to the site administrators via email and should be fixed shortly. Thanks for your patience." %}</p>
+
+{% endblock %}
+Felix: The file is _change_list_results.html, num is 3 
+
+{% load i18n static %}
+<div class="results">
+<table id="result_list">
+<thead>
+<tr>
+{% for header in result_headers %}
+<th scope="col" {{ header.class_attrib }}>
+   {% if header.sortable %}
+     {% if header.sort_priority > 0 %}
+       <div class="sortoptions">
+         <a class="sortremove" href="{{ header.url_remove }}" title="{% trans "Remove from sorting" %}"></a>
+         {% if num_sorted_fields > 1 %}<span class="sortpriority" title="{% blocktrans with priority_number=header.sort_priority %}Sorting priority: {{ priority_number }}{% endblocktrans %}">{{ header.sort_priority }}</span>{% endif %}
+         <a href="{{ header.url_toggle }}" class="toggle {% if header.ascending %}ascending{% else %}descending{% endif %}" title="{% trans "Toggle sorting" %}"></a>
+       </div>
+     {% endif %}
+   {% endif %}
+   <div class="text">{% if header.sortable %}<a href="{{ header.url_primary }}">{{ header.text|capfirst }}</a>{% else %}<span>{{ header.text|capfirst }}</span>{% endif %}</div>
+   <div class="clear"></div>
+</th>{% endfor %}
+</tr>
+</thead>
+
+{% if results %}
+<tbody>
+{% for result in results %}
+{% if result.form.non_field_errors %}
+    <tr><td colspan="{{ result|length }}">{{ result.form.non_field_errors }}</td></tr>
+{% endif %}
+<tr class="{% cycle 'row1' 'row2' %}">{% for item in result %}{{ item }}{% endfor %}</tr>
+{% endfor %}
+</tbody>
+</table>
+</div>
+{% endif %}
+Felix: The file is _index.html, num is 4 
+
+{% extends "vrg_app/base_site.html" %}
+{% load i18n static %}
+
+{% block extrastyle %}{{ block.super }}<link rel="stylesheet" type="text/css" href="{% static "vrg_app/css/dashboard.css" %}" />{% endblock %}
+
+{% block coltype %}colMS{% endblock %}
+
+{% block bodyclass %}{{ block.super }} dashboard{% endblock %}
+
+{% block breadcrumbs %}{% endblock %}
+
+{% block content %}
+<div id="content-main">
+
+{% if app_list %}
+    {% for app in app_list %}
+        <div class="app-{{ app.app_label }} module">
+        <table>
+        <caption>
+            <a href="{{ app.app_url }}" class="section" title="{% blocktrans with name=app.name %}Models in the {{ name }} application{% endblocktrans %}">{{ app.name }}</a>
+        </caption>
+        {% for model in app.models %}
+            <tr class="model-{{ model.object_name|lower }}">
+            {% if model.vrg_app_url %}
+                <th scope="row"><a href="{{ model.vrg_app_url }}">{{ model.name }}</a></th>
+            {% else %}
+                <th scope="row">{{ model.name }}</th>
+            {% endif %}
+
+            {% if model.add_url %}
+                <td><a href="{{ model.add_url }}" class="addlink">{% trans 'Add' %}</a></td>
+            {% else %}
+                <td>&nbsp;</td>
+            {% endif %}
+
+            {% if model.vrg_app_url %}
+                <td><a href="{{ model.vrg_app_url }}" class="changelink">{% trans 'Change' %}</a></td>
+            {% else %}
+                <td>&nbsp;</td>
+            {% endif %}
+            </tr>
+        {% endfor %}
+        </table>
+        </div>
+    {% endfor %}
+{% else %}
+    <p>{% trans "You don't have permission to edit anything." %}</p>
+{% endif %}
+</div>
+{% endblock %}
+
+{% block sidebar %}
+<div id="content-related">
+    <div class="module" id="recent-actions-module">
+        <h2>{% trans 'Recent actions' %}</h2>
+        <h3>{% trans 'My actions' %}</h3>
+            {% load log %}
+            {% get_vrg_app_log 10 as vrg_app_log for_user user %}
+            {% if not vrg_app_log %}
+            <p>{% trans 'None available' %}</p>
+            {% else %}
+            <ul class="actionlist">
+            {% for entry in vrg_app_log %}
+            <li class="{% if entry.is_addition %}addlink{% endif %}{% if entry.is_change %}changelink{% endif %}{% if entry.is_deletion %}deletelink{% endif %}">
+                {% if entry.is_deletion or not entry.get_vrg_app_url %}
+                    {{ entry.object_repr }}
+                {% else %}
+                    <a href="{{ entry.get_vrg_app_url }}">{{ entry.object_repr }}</a>
+                {% endif %}
+                <br/>
+                {% if entry.content_type %}
+                    <span class="mini quiet">{% filter capfirst %}{{ entry.content_type }}{% endfilter %}</span>
+                {% else %}
+                    <span class="mini quiet">{% trans 'Unknown content' %}</span>
+                {% endif %}
+            </li>
+            {% endfor %}
+            </ul>
+            {% endif %}
+    </div>
+</div>
+{% endblock %}
+Felix: The file is actions.html, num is 5 
+
+{% load i18n %}
+<div class="actions">
+    {% for field in action_form %}{% if field.label %}<label>{{ field.label }} {% endif %}{{ field }}{% if field.label %}</label>{% endif %}{% endfor %}
+    <button type="submit" class="button" title="{% trans "Run the selected action" %}" name="index" value="{{ action_index|default:0 }}">{% trans "Go" %}</button>
+    {% if actions_selection_counter %}
+        <span class="action-counter" data-actions-icnt="{{ cl.result_list|length }}">{{ selection_note }}</span>
+        {% if cl.result_count != cl.result_list|length %}
+        <span class="all">{{ selection_note_all }}</span>
+        <span class="question">
+            <a href="#" title="{% trans "Click here to select the objects across all pages" %}">{% blocktrans with cl.result_count as total_count %}Select all {{ total_count }} {{ module_name }}{% endblocktrans %}</a>
+        </span>
+        <span class="clear"><a href="#">{% trans "Clear selection" %}</a></span>
+        {% endif %}
+    {% endif %}
+</div>
+Felix: The file is add_feature.html, num is 6 
+
+{% extends "verification_tracking/base_site.html" %}
+{% load i18n static %}
+
+{% block extrastyle %}
+  {{ block.super }}
+  <link rel="stylesheet" type="text/css" href="{% static "verification_tracking/css/changelists.css" %}" />
+  <link rel="stylesheet" type="text/css" href="{% static "verification_tracking/css/forms.css" %}" />
+  {{ media.css }}
+  {% if not actions_on_top and not actions_on_bottom %}
+    <style>
+      #changelist table thead th:first-child {width: inherit}
+    </style>
+  {% endif %}
+{% endblock %}
+
+{% block extrahead %}
+{{ block.super }}
+{{ media.js }}
+{% endblock %}
+
+
+{% if not is_popup %}
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+<a href="{% url 'verification_tracking:index' %}">{% trans 'Home' %}</a>
+</div>
+{% endblock %}
+{% endif %}
+
+{% block coltype %}flex{% endblock %}
+
+{% block content %}
+
+    <form id="changelist-form" method="post" enctype="multipart/form-data" novalidate>{% csrf_token %}
+
+    {% if errornote %}
+    <p class="errornote">
+        {{errornote}}
+    </p>
+    {% endif %}
+
+    {% if infos %}
+
+    <div >
+        <input type="submit" value="Submit" class="default" name="_save" />
+    </div>
+
+    {% block field_sets %}
+    {% for fieldset in infos %}
+      {% include "verification_tracking/includes/fieldset.html" %}
+    {% endfor %}
+    {% endblock %}
+     <fieldset class="module aligned ">
+
+    <div class="submit-row">
+        <input type="submit" value="Submit" class="default" name="_save" />
+    </div>
+    {% endif %}
+    
+    </form>
+
+{% endblock %}
+Felix: The file is app_index.html, num is 7 
+
+{% extends "admin/index.html" %}
+{% load i18n %}
+
+{% block bodyclass %}{{ block.super }} app-{{ app_label }}{% endblock %}
+
+{% if not is_popup %}
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+<a href="{% url 'admin:index' %}">{% trans 'Home' %}</a>
+&rsaquo;
+{% for app in app_list %}
+{{ app.name }}
+{% endfor %}
+</div>
+{% endblock %}
+{% endif %}
+
+{% block sidebar %}{% endblock %}
+Felix: The file is base.html, num is 8 
+
+{% load i18n static %}<!DOCTYPE html>
+{% get_current_language as LANGUAGE_CODE %}{% get_current_language_bidi as LANGUAGE_BIDI %}
+<html lang="{{ LANGUAGE_CODE|default:"en-us" }}" {% if LANGUAGE_BIDI %}dir="rtl"{% endif %}>
+<head>
+<title>{% block title %}{% endblock %}</title>
+<link rel="stylesheet" type="text/css" href="{% block stylesheet %}{% static "verification_tracking/css/base.css" %}{% endblock %}" />
+{% block extrastyle %}{% endblock %}
+{% if LANGUAGE_BIDI %}<link rel="stylesheet" type="text/css" href="{% block stylesheet_rtl %}{% static "verification_tracking/css/rtl.css" %}{% endblock %}" />{% endif %}
+{% block extrahead %}{% endblock %}
+{% block blockbots %}<meta name="robots" content="NONE,NOARCHIVE" />{% endblock %}
+</head>
+{% load i18n %}
+
+<body class="{% if is_popup %}popup {% endif %}{% block bodyclass %}{% endblock %}"
+  data-admin-utc-offset="{% now "Z" %}">
+
+<!-- Container -->
+<div id="container">
+
+    {% if not is_popup %}
+    <!-- Header -->
+    <div id="header">
+        <div id="branding">
+        {% block branding %}{% endblock %}
+        </div>
+        {% block usertools %}
+        <div id="user-tools">
+            {% block welcome-msg %}
+                {% if user.is_active %}
+                    {% trans 'Welcome,' %}
+                    <strong>{% firstof user.get_short_name user.get_username %}</strong>.
+                {% else %}
+                    {% trans 'Please login.' %}
+                {% endif %}
+            {% endblock %}
+            {% block userlinks %}
+                {% if user.is_active %}
+                    <a href={% url 'verification_tracking:workspace' user.id %}>{% trans 'workspace' %}</a> /
+                    <a href={% url 'verification_tracking:review' user.id %}>{% trans 'review' %}</a>
+                /    <a href={% url 'verification_tracking:status_list' user.id %}>{% trans 'status' %}</a>
+                    {% if user.has_usable_password %}
+               /     <a href="{% url 'verification_tracking:password_change' %}">{% trans 'Change password' %}</a> /
+                    {% endif %}
+                    <a href="{% url 'verification_tracking:logout' %}">{% trans 'Log out' %}</a>  
+                {% else %}
+                     <a href={% url 'verification_tracking:login' %}>{% trans 'Login' %}</a>
+                {% endif %}
+            {% endblock %}
+        </div>
+        {% endblock %}
+        {% block nav-global %}{% endblock %}
+    </div>
+    <!-- END Header -->
+    {% block breadcrumbs %}
+    <div class="breadcrumbs">
+    <a href="{% url 'verification_tracking:index' %}">{% trans 'Home' %}</a>
+    {% if title %} &rsaquo; {{ title }}{% endif %}
+    </div>
+    {% endblock %}
+    {% endif %}
+
+    {% block messages %}
+        {% if messages %}
+        <ul class="messagelist">{% for message in messages %}
+          <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message|capfirst }}</li>
+        {% endfor %}</ul>
+    {% endif %}
+    {% endblock messages %}
+
+
+    <!-- Content -->
+    <div id="content" class="{% block coltype %}colM{% endblock %}">
+        {% block pretitle %}{% endblock %}
+        {% block content_title %}
+        {% if title %}<h1>{{ title }}
+        {% if description %} : {{ description }}{% endif %}
+        </h1>{% endif %}
+        {% endblock %}
+        {% block content %}
+        {% block object-tools %}{% endblock %}
+        {{ content }}
+        {% endblock %}
+        {% block sidebar %}{% endblock %}
+        <br class="clear" />
+    </div>
+    <!-- END Content -->
+
+    {% block footer %}<div id="footer"></div>{% endblock %}
+</div>
+<!-- END Container -->
+
+</body>
+</html>
+Felix: The file is base_site.html, num is 9 
+
+{% extends "verification_tracking/base.html" %}
+
+{% block title %}{{ title }} | {{ site_title|default:_('Django site admin') }}{% endblock %}
+
+{% block branding %}
+<h1 id="site-name"><a href="{% url 'verification_tracking:index' %}">verifcation tracking system </a></h1>
+{% endblock %}
+
+{% block nav-global %}{% endblock %}
+Felix: The file is change_feature.html, num is 10 
+
+{% extends "verification_tracking/base_site.html" %}
+{% load i18n static %}
+
+{% block extrastyle %}
+  {{ block.super }}
+  <link rel="stylesheet" type="text/css" href="{% static "verification_tracking/css/changelists.css" %}" />
+  <link rel="stylesheet" type="text/css" href="{% static "verification_tracking/css/forms.css" %}" />
+  {{ media.css }}
+  {% if not actions_on_top and not actions_on_bottom %}
+    <style>
+      #changelist table thead th:first-child {width: inherit}
+    </style>
+  {% endif %}
+{% endblock %}
+
+{% block extrahead %}
+{{ block.super }}
+{{ media.js }}
+{% endblock %}
+
+
+{% if not is_popup %}
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+<a href="{% url 'verification_tracking:index' %}">{% trans 'Home' %}</a>
+</div>
+{% endblock %}
+{% endif %}
+
+{% block coltype %}flex{% endblock %}
+
+{% block content %}
+    <form id="changelist-form" method="post" enctype="multipart/form-data" novalidate>{% csrf_token %}
+
+    {% if errornote %}
+    <p class="errornote">
+        {{errornote}}
+    </p>
+    {% endif %}
+
+    {% if infos %}
+    <div class="submit-row">
+        <input type="submit" value="Submit" class="default" name="_save" />
+    </div>
+
+    {% block field_sets %}
+    {% for fieldset in infos %}
+      {% include "verification_tracking/includes/fieldset.html" %}
+    {% endfor %}
+    {% endblock %}
+     <fieldset class="module aligned ">
+
+    <div class="submit-row">
+        <input type="submit" value="Submit" class="default" name="_save" />
+    </div>
+    {% endif %}
+    
+    </form>
+
+{% endblock %}
+Felix: The file is change_form.html, num is 11 
+
+{% extends "admin/base_site.html" %}
+{% load i18n admin_urls static admin_modify %}
+
+{% block extrahead %}{{ block.super }}
+<script type="text/javascript" src="{% url 'admin:jsi18n' %}"></script>
+{{ media }}
+{% endblock %}
+
+{% block extrastyle %}{{ block.super }}<link rel="stylesheet" type="text/css" href="{% static "admin/css/forms.css" %}" />{% endblock %}
+
+{% block coltype %}colM{% endblock %}
+
+{% block bodyclass %}{{ block.super }} app-{{ opts.app_label }} model-{{ opts.model_name }} change-form{% endblock %}
+
+{% if not is_popup %}
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+<a href="{% url 'admin:index' %}">{% trans 'Home' %}</a>
+&rsaquo; <a href="{% url 'admin:app_list' app_label=opts.app_label %}">{{ opts.app_config.verbose_name }}</a>
+&rsaquo; {% if has_change_permission %}<a href="{% url opts|admin_urlname:'changelist' %}">{{ opts.verbose_name_plural|capfirst }}</a>{% else %}{{ opts.verbose_name_plural|capfirst }}{% endif %}
+&rsaquo; {% if add %}{% blocktrans with name=opts.verbose_name %}Add {{ name }}{% endblocktrans %}{% else %}{{ original|truncatewords:"18" }}{% endif %}
+</div>
+{% endblock %}
+{% endif %}
+
+{% block content %}<div id="content-main">
+{% block object-tools %}
+{% if change %}{% if not is_popup %}
+  <ul class="object-tools">
+    {% block object-tools-items %}
+    <li>
+        {% url opts|admin_urlname:'history' original.pk|admin_urlquote as history_url %}
+        <a href="{% add_preserved_filters history_url %}" class="historylink">{% trans "History" %}</a>
+    </li>
+    {% if has_absolute_url %}<li><a href="{{ absolute_url }}" class="viewsitelink">{% trans "View on site" %}</a></li>{% endif %}
+    {% endblock %}
+  </ul>
+{% endif %}{% endif %}
+{% endblock %}
+<form {% if has_file_field %}enctype="multipart/form-data" {% endif %}action="{{ form_url }}" method="post" id="{{ opts.model_name }}_form" novalidate>{% csrf_token %}{% block form_top %}{% endblock %}
+<div>
+{% if is_popup %}<input type="hidden" name="{{ is_popup_var }}" value="1" />{% endif %}
+{% if to_field %}<input type="hidden" name="{{ to_field_var }}" value="{{ to_field }}" />{% endif %}
+{% if save_on_top %}{% block submit_buttons_top %}{% submit_row %}{% endblock %}{% endif %}
+{% if errors %}
+    <p class="errornote">
+    {% if errors|length == 1 %}{% trans "Please correct the error below." %}{% else %}{% trans "Please correct the errors below." %}{% endif %}
+    </p>
+    {{ adminform.form.non_field_errors }}
+{% endif %}
+
+{% block field_sets %}
+{% for fieldset in adminform %}
+  {% include "admin/includes/fieldset.html" %}
+{% endfor %}
+{% endblock %}
+
+{% block after_field_sets %}{% endblock %}
+
+{% block inline_field_sets %}
+{% for inline_admin_formset in inline_admin_formsets %}
+    {% include inline_admin_formset.opts.template %}
+{% endfor %}
+{% endblock %}
+
+{% block after_related_objects %}{% endblock %}
+
+{% block submit_buttons_bottom %}{% submit_row %}{% endblock %}
+
+{% block admin_change_form_document_ready %}
+    <script type="text/javascript"
+            id="django-admin-form-add-constants"
+            src="{% static 'admin/js/change_form.js' %}"
+            {% if adminform and add %}
+                data-model-name="{{ opts.model_name }}"
+            {% endif %}>
+    </script>
+{% endblock %}
+
+{# JavaScript for prepopulated fields #}
+{% prepopulated_fields_js %}
+
+</div>
+</form></div>
+{% endblock %}
+Felix: The file is change_list.html, num is 12 
+
+{% extends "admin/base_site.html" %}
+{% load i18n admin_urls static admin_list %}
+
+{% block extrastyle %}
+  {{ block.super }}
+  <link rel="stylesheet" type="text/css" href="{% static "admin/css/changelists.css" %}" />
+  {% if cl.formset %}
+    <link rel="stylesheet" type="text/css" href="{% static "admin/css/forms.css" %}" />
+  {% endif %}
+  {% if cl.formset or action_form %}
+    <script type="text/javascript" src="{% url 'admin:jsi18n' %}"></script>
+  {% endif %}
+  {{ media.css }}
+  {% if not actions_on_top and not actions_on_bottom %}
+    <style>
+      #changelist table thead th:first-child {width: inherit}
+    </style>
+  {% endif %}
+{% endblock %}
+
+{% block extrahead %}
+{{ block.super }}
+{{ media.js }}
+{% endblock %}
+
+{% block bodyclass %}{{ block.super }} app-{{ opts.app_label }} model-{{ opts.model_name }} change-list{% endblock %}
+
+{% if not is_popup %}
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+<a href="{% url 'admin:index' %}">{% trans 'Home' %}</a>
+&rsaquo; <a href="{% url 'admin:app_list' app_label=cl.opts.app_label %}">{{ cl.opts.app_config.verbose_name }}</a>
+&rsaquo; {{ cl.opts.verbose_name_plural|capfirst }}
+</div>
+{% endblock %}
+{% endif %}
+
+{% block coltype %}flex{% endblock %}
+
+{% block content %}
+  <div id="content-main">
+    {% block object-tools %}
+        <ul class="object-tools">
+          {% block object-tools-items %}
+            {% if has_add_permission %}
+            <li>
+              {% url cl.opts|admin_urlname:'add' as add_url %}
+              <a href="{% add_preserved_filters add_url is_popup to_field %}" class="addlink">
+                {% blocktrans with cl.opts.verbose_name as name %}Add {{ name }}{% endblocktrans %}
+              </a>
+            </li>
+            {% endif %}
+          {% endblock %}
+        </ul>
+    {% endblock %}
+    {% if cl.formset.errors %}
+        <p class="errornote">
+        {% if cl.formset.total_error_count == 1 %}{% trans "Please correct the error below." %}{% else %}{% trans "Please correct the errors below." %}{% endif %}
+        </p>
+        {{ cl.formset.non_form_errors }}
+    {% endif %}
+    <div class="module{% if cl.has_filters %} filtered{% endif %}" id="changelist">
+      {% block search %}{% search_form cl %}{% endblock %}
+      {% block date_hierarchy %}{% date_hierarchy cl %}{% endblock %}
+
+      {% block filters %}
+        {% if cl.has_filters %}
+          <div id="changelist-filter">
+            <h2>{% trans 'Filter' %}</h2>
+            {% for spec in cl.filter_specs %}{% admin_list_filter cl spec %}{% endfor %}
+          </div>
+        {% endif %}
+      {% endblock %}
+
+      <form id="changelist-form" method="post"{% if cl.formset.is_multipart %} enctype="multipart/form-data"{% endif %} novalidate>{% csrf_token %}
+      {% if cl.formset %}
+        <div>{{ cl.formset.management_form }}</div>
+      {% endif %}
+
+      {% block result_list %}
+          {% if action_form and actions_on_top and cl.show_admin_actions %}{% admin_actions %}{% endif %}
+          {% result_list cl %}
+          {% if action_form and actions_on_bottom and cl.show_admin_actions %}{% admin_actions %}{% endif %}
+      {% endblock %}
+      {% block pagination %}{% pagination cl %}{% endblock %}
+
+
+      </form>
+    </div>
+  </div>
+{% endblock %}
+Felix: The file is change_list_results.html, num is 13 
+
+{% load i18n static %}
+<div class="results">
+<table id="result_list">
+<thead>
+<tr>
+{% for header in result_headers %}
+<th scope="col" class="sortable column-type">
+   <div class="text">{{ header.text|capfirst }}</div>
+   <div class="clear"></div>
+</th>{% endfor %}
+</tr>
+</thead>
+
+{% if results %}
+<tbody>
+{% for result in results %}
+{% if result.form.non_field_errors %}
+    <tr><td colspan="{{ result|length }}">{{ result.form.non_field_errors }}</td></tr>
+{% endif %}
+<tr class="{% cycle 'row1' 'row2' %}">{% for item in result %}{{ item }}{% endfor %}</tr>
+{% endfor %}
+</tbody>
+</table>
+</div>
+{% endif %}
+Felix: The file is change_point.html, num is 14 
+
+{% extends "verification_tracking/base_site.html" %}
+{% load i18n static %}
+
+{% block extrastyle %}
+  {{ block.super }}
+  <link rel="stylesheet" type="text/css" href="{% static "verification_tracking/css/changelists.css" %}" />
+  <link rel="stylesheet" type="text/css" href="{% static "verification_tracking/css/forms.css" %}" />
+  {{ media.css }}
+  {% if not actions_on_top and not actions_on_bottom %}
+    <style>
+      #changelist table thead th:first-child {width: inherit}
+    </style>
+  {% endif %}
+{% endblock %}
+
+{% block extrahead %}
+{{ block.super }}
+{{ media.js }}
+{% endblock %}
+
+
+{% if not is_popup %}
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+<a href="{% url 'verification_tracking:index' %}">{% trans 'Home' %}</a>
+</div>
+{% endblock %}
+{% endif %}
+
+{% block coltype %}flex{% endblock %}
+
+{% block content %}
+    <form id="changelist-form" method="post" enctype="multipart/form-data" novalidate>{% csrf_token %}
+
+    {% if errornote %}
+    <p class="errornote">
+        {{errornote}}
+    </p>
+    {% endif %}
+
+    {% if infos %}
+
+    <div class="row">
+        <input type="submit" value="Submit" class="default" name="_save" />
+    </div>
+
+    {% block field_sets %}
+    {% for fieldset in infos %}
+      {% include "verification_tracking/includes/fieldset_for_change_point.html" %}
+    {% endfor %}
+    {% endblock %}
+    <fieldset class="module aligned ">
+
+    <div class="results">
+    <h2>COMMENTS</h2>
+    <table id="result_list">
+	<thead>
+	    <tr>
+		<th scope="col" class="sortable column-type">
+		<div class="text">Index</div>
+		<div class="clear"></div>
+		</th>
+		<th scope="col" class="sortable column-type">
+		<div class="text">Create</div>
+		<div class="clear"></div>
+		</th>
+		<th scope="col" class="sortable column-type">
+		<div class="text">Author</div>
+		<div class="clear"></div>
+		</th>
+		<th scope="col" class="sortable column-type">
+		<div class="text">Content</div>
+		<div class="clear"></div>
+		</th>
+	    </tr>
+	</thead>
+	<tbody>
+	    {% for comment in point.pointcomment_set.all %}
+	    <tr class="{% cycle 'row1' 'row2' %}">
+		<td>{{forloop.counter}}</td>
+		<td>{{comment.add_time}}</td>
+		<td>{{comment.Assignee}}</td>
+		<td>{{comment.content|linebreaks}}</td>
+	    </tr>
+	    {% endfor %}
+	</tbody>
+    </table>
+    </div>
+
+
+    <h2>ADD COMMENT</h2>
+    <div class="form-row field-type">
+    <div>
+	<label class="required" for="id_content">Comment:</label>
+	<textarea class="vLargeTextField" cols="40" id="id_content" maxlength="900" name="comment" rows="10"></textarea>
+    </div>
+    </div>
+
+    <div class="submit-row">
+        <input type="submit" value="Submit" class="default" name="_save" />
+    </div>
+    {% endif %}
+    
+    </form>
+
+{% endblock %}
+Felix: The file is component.html, num is 15 
+
+{% extends "verification_tracking/base_site.html" %}
+{% load i18n static vrg_list %}
+
+{% block extrastyle %}
+  {{ block.super }}
+  <link rel="stylesheet" type="text/css" href="{% static "verification_tracking/css/changelists.css" %}" />
+    <link rel="stylesheet" type="text/css" href="{% static "verification_tracking/css/forms.css" %}" />
+  {{ media.css }}
+  {% if not actions_on_top and not actions_on_bottom %}
+    <style>
+      #changelist table thead th:first-child {width: inherit}
+    </style>
+  {% endif %}
+{% endblock %}
+
+{% block extrahead %}
+{{ block.super }}
+{{ media.js }}
+{% endblock %}
+
+
+{% if not is_popup %}
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+<a href="{% url 'verification_tracking:index' %}">{% trans 'Home' %}</a>
+&rsaquo; <a href="{% url 'verification_tracking:component' component.id %}">Component</a>
+&rsaquo; {{ component.name|capfirst }}
+</div>
+{% endblock %}
+{% endif %}
+
+{% block coltype %}flex{% endblock %}
+
+{% block content %}
+    <form id="changelist-form" method="post" enctype="multipart/form-data" novalidate>{% csrf_token %}
+    <ul class="object-tools">
+    <li>
+    <a href="{% url 'verification_tracking:add_feature' component.id %}" class="addlink">ADD FEATURE</a>
+    </li>    
+</ul>
+
+    {% if results %}
+    <div class="results">
+    <table id="result_list">
+	<thead>
+	    <tr>
+		{% for header in heads %}
+		<th scope="col" class="sortable column-type">
+		<div class="text">{{ header |capfirst }}</div>
+		<div class="clear"></div>
+		</th>{% endfor %}
+	    </tr>
+	</thead>
+	<tbody>
+	    {% for result in results %}
+		<tr class="{% cycle 'row1' 'row2' %}">{% for item in result %}{{ item }}{% endfor %}</tr>
+	    {% endfor %}
+	</tbody>
+    </table>
+    </div>
+    {% else %}
+        <p class="errornote">There is no verification Feature</p>
+    {% endif %}
+
+
+    </form>
+{% endblock %}
+Felix: The file is date_hierarchy.html, num is 16 
+
+{% if show %}
+<div class="xfull">
+<ul class="toplinks">
+{% if back %}<li class="date-back"><a href="{{ back.link }}">&lsaquo; {{ back.title }}</a></li>{% endif %}
+{% for choice in choices %}
+<li> {% if choice.link %}<a href="{{ choice.link }}">{% endif %}{{ choice.title }}{% if choice.link %}</a>{% endif %}</li>
+{% endfor %}
+</ul><br class="clear" />
+</div>
+{% endif %}
+Felix: The file is delete_confirmation.html, num is 17 
+
+{% extends "admin/base_site.html" %}
+{% load i18n admin_urls static %}
+
+{% block extrahead %}
+    {{ media }}
+    <script type="text/javascript" src="{% static 'admin/js/cancel.js' %}"></script>
+{% endblock %}
+
+{% block bodyclass %}{{ block.super }} app-{{ opts.app_label }} model-{{ opts.model_name }} delete-confirmation{% endblock %}
+
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+<a href="{% url 'admin:index' %}">{% trans 'Home' %}</a>
+&rsaquo; <a href="{% url 'admin:app_list' app_label=opts.app_label %}">{{ opts.app_config.verbose_name }}</a>
+&rsaquo; <a href="{% url opts|admin_urlname:'changelist' %}">{{ opts.verbose_name_plural|capfirst|escape }}</a>
+&rsaquo; <a href="{% url opts|admin_urlname:'change' object.pk|admin_urlquote %}">{{ object|truncatewords:"18" }}</a>
+&rsaquo; {% trans 'Delete' %}
+</div>
+{% endblock %}
+
+{% block content %}
+{% if perms_lacking %}
+    <p>{% blocktrans with escaped_object=object %}Deleting the {{ object_name }} '{{ escaped_object }}' would result in deleting related objects, but your account doesn't have permission to delete the following types of objects:{% endblocktrans %}</p>
+    <ul>
+    {% for obj in perms_lacking %}
+        <li>{{ obj }}</li>
+    {% endfor %}
+    </ul>
+{% elif protected %}
+    <p>{% blocktrans with escaped_object=object %}Deleting the {{ object_name }} '{{ escaped_object }}' would require deleting the following protected related objects:{% endblocktrans %}</p>
+    <ul>
+    {% for obj in protected %}
+        <li>{{ obj }}</li>
+    {% endfor %}
+    </ul>
+{% else %}
+    <p>{% blocktrans with escaped_object=object %}Are you sure you want to delete the {{ object_name }} "{{ escaped_object }}"? All of the following related items will be deleted:{% endblocktrans %}</p>
+    {% include "admin/includes/object_delete_summary.html" %}
+    <h2>{% trans "Objects" %}</h2>
+    <ul>{{ deleted_objects|unordered_list }}</ul>
+    <form method="post">{% csrf_token %}
+    <div>
+    <input type="hidden" name="post" value="yes" />
+    {% if is_popup %}<input type="hidden" name="{{ is_popup_var }}" value="1" />{% endif %}
+    {% if to_field %}<input type="hidden" name="{{ to_field_var }}" value="{{ to_field }}" />{% endif %}
+    <input type="submit" value="{% trans "Yes, I'm sure" %}" />
+    <a href="#" class="button cancel-link">{% trans "No, take me back" %}</a>
+    </div>
+    </form>
+{% endif %}
+{% endblock %}
+Felix: The file is delete_selected_confirmation.html, num is 18 
+
+{% extends "admin/base_site.html" %}
+{% load i18n l10n admin_urls static %}
+
+{% block extrahead %}
+    {{ media }}
+    <script type="text/javascript" src="{% static 'admin/js/cancel.js' %}"></script>
+{% endblock %}
+
+{% block bodyclass %}{{ block.super }} app-{{ opts.app_label }} model-{{ opts.model_name }} delete-confirmation delete-selected-confirmation{% endblock %}
+
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+<a href="{% url 'admin:index' %}">{% trans 'Home' %}</a>
+&rsaquo; <a href="{% url 'admin:app_list' app_label=opts.app_label %}">{{ opts.app_config.verbose_name }}</a>
+&rsaquo; <a href="{% url opts|admin_urlname:'changelist' %}">{{ opts.verbose_name_plural|capfirst }}</a>
+&rsaquo; {% trans 'Delete multiple objects' %}
+</div>
+{% endblock %}
+
+{% block content %}
+{% if perms_lacking %}
+    <p>{% blocktrans %}Deleting the selected {{ objects_name }} would result in deleting related objects, but your account doesn't have permission to delete the following types of objects:{% endblocktrans %}</p>
+    <ul>
+    {% for obj in perms_lacking %}
+        <li>{{ obj }}</li>
+    {% endfor %}
+    </ul>
+{% elif protected %}
+    <p>{% blocktrans %}Deleting the selected {{ objects_name }} would require deleting the following protected related objects:{% endblocktrans %}</p>
+    <ul>
+    {% for obj in protected %}
+        <li>{{ obj }}</li>
+    {% endfor %}
+    </ul>
+{% else %}
+    <p>{% blocktrans %}Are you sure you want to delete the selected {{ objects_name }}? All of the following objects and their related items will be deleted:{% endblocktrans %}</p>
+    {% include "admin/includes/object_delete_summary.html" %}
+    <h2>{% trans "Objects" %}</h2>
+    {% for deletable_object in deletable_objects %}
+        <ul>{{ deletable_object|unordered_list }}</ul>
+    {% endfor %}
+    <form method="post">{% csrf_token %}
+    <div>
+    {% for obj in queryset %}
+    <input type="hidden" name="{{ action_checkbox_name }}" value="{{ obj.pk|unlocalize }}" />
+    {% endfor %}
+    <input type="hidden" name="action" value="delete_selected" />
+    <input type="hidden" name="post" value="yes" />
+    <input type="submit" value="{% trans "Yes, I'm sure" %}" />
+    <a href="#" class="button cancel-link">{% trans "No, take me back" %}</a>
+    </div>
+    </form>
+{% endif %}
+{% endblock %}
+Felix: The file is feature.html, num is 19 
+
+{% extends "verification_tracking/base_site.html" %}
+{% load i18n static vrg_list %}
+
+{% block extrastyle %}
+  {{ block.super }}
+  <link rel="stylesheet" type="text/css" href="{% static "verification_tracking/css/changelists.css" %}" />
+    <link rel="stylesheet" type="text/css" href="{% static "verification_tracking/css/forms.css" %}" />
+  {{ media.css }}
+  {% if not actions_on_top and not actions_on_bottom %}
+    <style>
+      #changelist table thead th:first-child {width: inherit}
+    </style>
+  {% endif %}
+{% endblock %}
+
+{% block extrahead %}
+{{ block.super }}
+{{ media.js }}
+{% endblock %}
+
+
+{% if not is_popup %}
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+<a href="{% url 'verification_tracking:index' %}">{% trans 'Home' %}</a>
+&rsaquo; <a href="{% url 'verification_tracking:component' feature.component.id %}">{{feature.component.name}}</a>
+&rsaquo; <a href="{% url 'verification_tracking:feature' feature.id %}">Feature</a>
+&rsaquo; {{ feature.name|capfirst }}
+</div>
+{% endblock %}
+{% endif %}
+
+{% block coltype %}flex{% endblock %}
+
+{% block content %}
+    <form id="changelist-form" method="post" enctype="multipart/form-data" novalidate>{% csrf_token %}
+
+    {% if errornote %}
+    <p class="errornote">
+        {{errornote}}
+    </p>
+    {% endif %}
+
+    <ul class="object-tools">
+    
+    <li>
+    <a href="{% url 'verification_tracking:change_feature' feature.id %}" class="historylink">Modified Feature Type</a>
+    <a href="{% url 'verification_tracking:add_verification' feature.id %}" class="addlink">ADD VERIFICATION Point</a>
+    </li>    
+  </ul>
+
+
+    {% if results %}
+    <div class="results">
+    <table id="result_list">
+	<thead>
+	    <tr>
+		{% for header in heads %}
+		<th scope="col" class="sortable column-type">
+		<div class="text">{{ header |capfirst }}</div>
+		<div class="clear"></div>
+		</th>{% endfor %}
+	    </tr>
+	</thead>
+	<tbody>
+	    {% for result in results %}
+		<tr class="{% cycle 'row1' 'row2' %}">{% for item in result %}{{ item }}{% endfor %}</tr>
+	    {% endfor %}
+	</tbody>
+    </table>
+    </div>
+    {% else %}
+    <p class="errornote">There is no verification Point</p>
+
+{% endif %}
+
+
+    </form>
+{% endblock %}
+Felix: The file is filter.html, num is 20 
+
+{% load i18n %}
+<h3>{% blocktrans with filter_title=title %} By {{ filter_title }} {% endblocktrans %}</h3>
+<ul>
+{% for choice in choices %}
+    <li{% if choice.selected %} class="selected"{% endif %}>
+    <a href="{{ choice.query_string|iriencode }}">{{ choice.display }}</a></li>
+{% endfor %}
+</ul>
+Felix: The file is index.html, num is 21 
+
+{% extends "verification_tracking/base_site.html" %}
+{% load i18n static %}
+
+{% block extrastyle %}
+
+<style type="text/css">
+</style>
+
+{{ block.super }}
+<link rel="stylesheet" type="text/css" href="{% static "verification_tracking/css/dashboard.css" %}" />
+<link rel="stylesheet" type="text/css" href="{% static "verification_tracking/css/tablestyle.css" %}" />
+
+{% endblock %}
+
+
+
+{% block coltype %}colMS{% endblock %}
+
+{% block bodyclass %}{{ block.super }} dashboard{% endblock %}
+
+{% block breadcrumbs %}{% endblock %}
+
+{% block content %}
+
+
+	<section id="ownerComponents">
+    <ul id="components">
+        {% for component in components %}
+        <li class="component">
+				<ul class="componentContainer">
+                    <li class="design"><h2><a href={% url 'verification_tracking:component' component.id %}>{{component.name}}</a></h2></li>
+                    {#<li class="owner"><p><a href={% url 'verification_tracking:workspace' component.owner.id %}>{{component.owner}}</a></p></li>#}
+					<li>
+
+					</li>
+                    <li class="button"><a href={% url 'verification_tracking:component_status_list' component.id%}>Task Status</a></li>
+				</ul>
+		</li>
+        {% endfor %}
+
+	</ul> <!-- End ul#components -->
+    </section>
+
+
+<HR style="FILTER: alpha(opacity=100,finishopacity=0,style=2)" width="100%" color=#417690 SIZE=3>
+
+
+    	<section id="ownerComponents">
+    <ul id="components">
+        {% for component in special_components %}
+        <li class="component">
+				<ul class="componentContainer">
+                    <li class="design"><h2><a href={% url 'verification_tracking:component' component.id %}>{{component.name}}</a></h2></li>
+                    {#<li class="owner"><p><a href={% url 'verification_tracking:workspace' component.owner.id %}>{{component.owner}}</a></p></li>#}
+					<li>
+
+					</li>
+                    <li class="button"><a href={% url 'verification_tracking:component_status_list' component.id%}>Task Status</a></li>
+				</ul>
+		</li>
+        {% endfor %}
+
+	</ul> <!-- End ul#components -->
+    </section>
+
+
+<HR style="FILTER: alpha(opacity=100,finishopacity=0,style=2)" width="100%" color=#417690 SIZE=3>
+    <div>
+        <h2><a href={% url 'verification_tracking:cross_check' %}> VP centralize check </a><h2>
+            </div>
+    <div>
+        <h2><a href={% url 'verification_tracking:register_status' %}> class register status </a><h2>
+    </div>
+
+    <div>
+        <h2><a href={% url 'verification_tracking:coverage_trace' %}> feature coverage trace </a><h2>
+    </div>
+
+<HR style="FILTER: alpha(opacity=100,finishopacity=0,style=2)" width="100%" color=#417690 SIZE=3>
+    <div>
+        <h3><a href={% url 'verification_tracking:cross_check_update' %}> cross check update (Felix used only) </a><h3>
+        <h2><a href={% url 'verification_tracking:coverage_count' %}> feature coverage count </a><h2>
+    </div>
+
+        <h3><a href={% url 'verification_tracking:vrg_app' %}> vrg_app </a><h3>
+{% endblock %}
+
+{% block sidebar %}
+
+{% endblock %}
+Felix: The file is invalid_setup.html, num is 22 
+
+{% extends "admin/base_site.html" %}
+{% load i18n %}
+
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+<a href="{% url 'admin:index' %}">{% trans 'Home' %}</a>
+&rsaquo; {{ title }}
+</div>
+{% endblock %}
+
+{% block content %}
+<p>{% trans "Something's wrong with your database installation. Make sure the appropriate database tables have been created, and make sure the database is readable by the appropriate user." %}</p>
+{% endblock %}
+Felix: The file is login.html, num is 23 
+
+{% extends "verification_tracking/base_site.html" %}
+{% load i18n static %}
+
+{% block extrastyle %}{{ block.super }}<link rel="stylesheet" type="text/css" href="{% static "verification_tracking/css/login.css" %}" />
+{{ form.media }}
+{% endblock %}
+
+{% block bodyclass %}{{ block.super }} login{% endblock %}
+
+{% block usertools %}{% endblock %}
+
+{% block nav-global %}{% endblock %}
+
+{% block content_title %}{% endblock %}
+
+{% block breadcrumbs %}{% endblock %}
+
+{% block content %}
+{% if form.errors and not form.non_field_errors %}
+<p class="errornote">
+{% if form.errors.items|length == 1 %}{% trans "Please correct the error below." %}{% else %}{% trans "Please correct the errors below." %}{% endif %}
+</p>
+{% endif %}
+
+{% if form.non_field_errors %}
+{% for error in form.non_field_errors %}
+<p class="errornote">
+    {{ error }}
+</p>
+{% endfor %}
+{% endif %}
+
+<div id="content-main">
+
+{% if user.is_authenticated %}
+<p class="errornote">
+{% blocktrans trimmed %}
+    You are authenticated as {{ username }}, but are not authorized to
+    access this page. Would you like to login to a different account?
+{% endblocktrans %}
+</p>
+{% endif %}
+
+<form action="{{ app_path }}" method="post" id="login-form">{% csrf_token %}
+  <div class="form-row">
+    {{ form.username.errors }}
+    {{ form.username.label_tag }} {{ form.username }}
+  </div>
+  <div class="form-row">
+    {{ form.password.errors }}
+    {{ form.password.label_tag }} {{ form.password }}
+    <input type="hidden" name="next" value="{{ next }}" />
+  </div>
+  {% url 'admin_password_reset' as password_reset_url %}
+  {% if password_reset_url %}
+  <div class="password-reset-link">
+    <a href="{{ password_reset_url }}">{% trans 'Forgotten your password or username?' %}</a>
+  </div>
+  {% endif %}
+  <div class="submit-row">
+    <label>&nbsp;</label><input type="submit" value="{% trans 'Log in' %}" />
+  </div>
+</form>
+
+</div>
+{% endblock %}
+Felix: The file is object_history.html, num is 24 
+
+{% extends "admin/base_site.html" %}
+{% load i18n admin_urls %}
+
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+<a href="{% url 'admin:index' %}">{% trans 'Home' %}</a>
+&rsaquo; <a href="{% url 'admin:app_list' app_label=opts.app_label %}">{{ opts.app_config.verbose_name }}</a>
+&rsaquo; <a href="{% url opts|admin_urlname:'changelist' %}">{{ module_name }}</a>
+&rsaquo; <a href="{% url opts|admin_urlname:'change' object.pk|admin_urlquote %}">{{ object|truncatewords:"18" }}</a>
+&rsaquo; {% trans 'History' %}
+</div>
+{% endblock %}
+
+{% block content %}
+<div id="content-main">
+<div class="module">
+
+{% if action_list %}
+    <table id="change-history">
+        <thead>
+        <tr>
+            <th scope="col">{% trans 'Date/time' %}</th>
+            <th scope="col">{% trans 'User' %}</th>
+            <th scope="col">{% trans 'Action' %}</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for action in action_list %}
+        <tr>
+            <th scope="row">{{ action.action_time|date:"DATETIME_FORMAT" }}</th>
+            <td>{{ action.user.get_username }}{% if action.user.get_full_name %} ({{ action.user.get_full_name }}){% endif %}</td>
+            <td>{{ action.get_change_message }}</td>
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+{% else %}
+    <p>{% trans "This object doesn't have a change history. It probably wasn't added via this admin site." %}</p>
+{% endif %}
+</div>
+</div>
+{% endblock %}
+Felix: The file is pagination.html, num is 25 
+
+{% load admin_list %}
+{% load i18n %}
+<p class="paginator">
+{% if pagination_required %}
+{% for i in page_range %}
+    {% paginator_number cl i %}
+{% endfor %}
+{% endif %}
+{{ cl.result_count }} {% if cl.result_count == 1 %}{{ cl.opts.verbose_name }}{% else %}{{ cl.opts.verbose_name_plural }}{% endif %}
+{% if show_all_url %}&nbsp;&nbsp;<a href="{{ show_all_url }}" class="showall">{% trans 'Show all' %}</a>{% endif %}
+{% if cl.formset and cl.result_count %}<input type="submit" name="_save" class="default" value="{% trans 'Save' %}"/>{% endif %}
+</p>
+Felix: The file is point.html, num is 26 
+
+{% extends "verification_tracking/base_site.html" %}
+{% load i18n static %}
+
+{% block extrastyle %}
+  {{ block.super }}
+  <link rel="stylesheet" type="text/css" href="{% static "verification_tracking/css/changelists.css" %}" />
+  <link rel="stylesheet" type="text/css" href="{% static "verification_tracking/css/forms.css" %}" />
+  {{ media.css }}
+  {% if not actions_on_top and not actions_on_bottom %}
+    <style>
+      #changelist table thead th:first-child {width: inherit}
+    </style>
+  {% endif %}
+{% endblock %}
+
+{% block extrahead %}
+{{ block.super }}
+{{ media.js }}
+{% endblock %}
+
+
+{% if not is_popup %}
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+<a href="{% url 'verification_tracking:index' %}">{% trans 'Home' %}</a>
+&rsaquo; <a href="{% url 'verification_tracking:feature' point.feature.id %}">{{point.attribute.name|capfirst}}</a>
+&rsaquo; <a href="{% url 'verification_tracking:point' point.id %}">point</a>
+&rsaquo; {{ point.name|capfirst }}
+</div>
+{% endblock %}
+{% endif %}
+
+{% block coltype %}flex{% endblock %}
+
+{% block content %}
+    <form id="changelist-form" method="post" enctype="multipart/form-data" novalidate>{% csrf_token %}
+    <ul class="object-tools">
+    
+    <li>
+    <a href="{% url 'verification_tracking:change_verification' point.id %}" class="historylink">Modified Verification Point</a>
+    </li>    
+    </ul>
+    {% block field_sets %}
+    {% for fieldset in infos %}
+      {% include "verification_tracking/includes/fieldset.html" %}
+    {% endfor %}
+    {% endblock %}
+     <fieldset class="module aligned ">
+
+    
+    <div class="results">
+    <h2>COMMENTS</h2>
+    <table id="result_list">
+	<thead>
+	    <tr>
+		<th scope="col" class="sortable column-type">
+		<div class="text">Index</div>
+		<div class="clear"></div>
+		</th>
+		<th scope="col" class="sortable column-type">
+		<div class="text">Create</div>
+		<div class="clear"></div>
+		</th>
+		<th scope="col" class="sortable column-type">
+		<div class="text">Author</div>
+		<div class="clear"></div>
+		</th>
+		<th scope="col" class="sortable column-type">
+		<div class="text">Content</div>
+		<div class="clear"></div>
+		</th>
+	    </tr>
+	</thead>
+	<tbody>
+	    {% for comment in point.pointcomment_set.all %}
+	    <tr class="{% cycle 'row1' 'row2' %}">
+		<td>{{forloop.counter}}</td>
+		<td>{{comment.add_time}}</td>
+		<td>{{comment.Author}}</td>
+		<td>{{comment.content|linebreaks}}</td>
+	    </tr>
+	    {% endfor %}
+	</tbody>
+    </table>
+    </div>
+
+    <h2>ADD COMMENT</h2>
+    <div class="form-row field-type">
+    <div>
+	<label class="required" for="id_content">Comment:</label>
+	<textarea class="vLargeTextField" cols="40" id="id_content" maxlength="900" name="comment" rows="10"></textarea>
+    </div>
+    </div>
+
+    <div class="submit-row">
+    <input type="submit" value="Submit" class="default" name="_save" />
+    </div>
+
+
+
+    
+</form>
+
+{% endblock %}
+Felix: The file is popup_response.html, num is 27 
+
+{% load i18n static %}<!DOCTYPE html>
+<html>
+  <head><title>{% trans 'Popup closing...' %}</title></head>
+  <body>
+    <script type="text/javascript"
+            id="django-admin-popup-response-constants"
+            src="{% static "admin/js/popup_response.js" %}"
+            data-popup-response="{{ popup_response_data }}">
+    </script>
+  </body>
+</html>
+Felix: The file is prepopulated_fields_js.html, num is 28 
+
+{% load l10n static %}
+<script type="text/javascript"
+        id="django-admin-prepopulated-fields-constants"
+        src="{% static "admin/js/prepopulate_init.js" %}"
+        data-prepopulated-fields="{{ prepopulated_fields_json }}">
+</script>
+Felix: The file is related_widget_wrapper.html, num is 29 
+
+{% load i18n static %}
+<div class="related-widget-wrapper">
+    {{ widget }}
+    {% block links %}
+        {% if can_change_related %}
+        <a class="related-widget-wrapper-link change-related" id="change_id_{{ name }}"
+            data-href-template="{{ change_related_template_url }}?{{ url_params }}"
+            title="{% blocktrans %}Change selected {{ model }}{% endblocktrans %}">
+            <img src="{% static 'admin/img/icon-changelink.svg' %}" alt="{% trans 'Change' %}"/>
+        </a>
+        {% endif %}
+        {% if can_add_related %}
+        <a class="related-widget-wrapper-link add-related" id="add_id_{{ name }}"
+            href="{{ add_related_url }}?{{ url_params }}"
+            title="{% blocktrans %}Add another {{ model }}{% endblocktrans %}">
+            <img src="{% static 'admin/img/icon-addlink.svg' %}" alt="{% trans 'Add' %}"/>
+        </a>
+        {% endif %}
+        {% if can_delete_related %}
+        <a class="related-widget-wrapper-link delete-related" id="delete_id_{{ name }}"
+            data-href-template="{{ delete_related_template_url }}?{{ url_params }}"
+            title="{% blocktrans %}Delete selected {{ model }}{% endblocktrans %}">
+            <img src="{% static 'admin/img/icon-deletelink.svg' %}" alt="{% trans 'Delete' %}"/>
+        </a>
+        {% endif %}
+    {% endblock %}
+</div>
+Felix: The file is review.html, num is 30 
+
+{% extends "verification_tracking/base_site.html" %}
+{% load i18n static %}
+
+{% block extrastyle %}
+  {{ block.super }}
+  <link rel="stylesheet" type="text/css" href="{% static "verification_tracking/css/changelists.css" %}" />
+  <link rel="stylesheet" type="text/css" href="{% static "verification_tracking/css/forms.css" %}" />
+  {{ media.css }}
+  {% if not actions_on_top and not actions_on_bottom %}
+    <style>
+      #changelist table thead th:first-child {width: inherit}
+    </style>
+  {% endif %}
+{% endblock %}
+
+{% block extrahead %}
+{{ block.super }}
+{{ media.js }}
+{% endblock %}
+
+
+{% if not is_popup %}
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+<a href="{% url 'verification_tracking:index' %}">{% trans 'Home' %}</a>
+</div>
+{% endblock %}
+{% endif %}
+
+{% block coltype %}flex{% endblock %}
+
+{% block content %}
+
+    <div class="results">
+    <h2>Pending Task</h2>
+    <table id="result_list">
+	<thead>
+	    <tr>
+		<th scope="col" class="sortable column-type">
+		<div class="text">Index</div>
+		<div class="clear"></div>
+		</th>
+		<th scope="col" class="sortable column-type">
+		<div class="text">Feature Type</div>
+		<div class="clear"></div>
+        </th>
+		<th scope="col" class="sortable column-type">
+		<div class="text">Feature Point</div>
+		<div class="clear"></div>
+        </th>
+        <th scope="col" class="sortable column-type">
+		<div class="text">Feature_tatus</div>
+		<div class="clear"></div>
+		</th>
+        <th scope="col" class="sortable column-type">
+		<div class="text">Cover_status</div>
+		<div class="clear"></div>
+		</th>
+        <th scope="col" class="sortable column-type">
+		<div class="text">Stimulus_status</div>
+		<div class="clear"></div>
+		</th>
+        <th scope="col" class="sortable column-type">
+		<div class="text">Check_way_status</div>
+		<div class="clear"></div>
+		</th>
+		<th scope="col" class="sortable column-type">
+		<div class="text">Add time</div>
+		<div class="clear"></div>
+		</th>
+		<th scope="col" class="sortable column-type">
+		<div class="text">Modified time</div>
+		<div class="clear"></div>
+		</th>
+	    </tr>
+	</thead>
+	<tbody>
+	    {% for feature in features %}
+	    <tr class="{% cycle 'row1' 'row2' %}">
+		<td>{{forloop.counter}}</td>
+        <td><a href={% url 'verification_tracking:feature' feature.feature.id %}>{{feature.feature.name}}</a></td>
+        <td><a href={% url 'verification_tracking:point' feature.id %}>{{feature.name}}</a></td>
+		<td>{{feature.get_feature_status_display}}</td>
+		<td>{{feature.get_cover_status_display}}</td>
+		<td>{{feature.get_stimulus_status_display}}</td>
+		<td>{{feature.get_check_way_status_display}}</td>
+		<td>{{feature.add_time|date:"m-d" }}</td>
+		<td>{{feature.modified_time|date:"m-d" }}</td>
+	    </tr>
+	    {% endfor %}
+	</tbody>
+	</table>
+
+    </div>
+
+    
+
+{% endblock %}
+Felix: The file is search_form.html, num is 31 
+
+{% load i18n static %}
+{% if cl.search_fields %}
+<div id="toolbar"><form id="changelist-search" method="get">
+<div><!-- DIV needed for valid HTML -->
+<label for="searchbar"><img src="{% static "admin/img/search.svg" %}" alt="Search" /></label>
+<input type="text" size="40" name="{{ search_var }}" value="{{ cl.query }}" id="searchbar" autofocus />
+<input type="submit" value="{% trans 'Search' %}" />
+{% if show_result_count %}
+    <span class="small quiet">{% blocktrans count counter=cl.result_count %}{{ counter }} result{% plural %}{{ counter }} results{% endblocktrans %} (<a href="?{% if cl.is_popup %}_popup=1{% endif %}">{% if cl.show_full_result_count %}{% blocktrans with full_result_count=cl.full_result_count %}{{ full_result_count }} total{% endblocktrans %}{% else %}{% trans "Show all" %}{% endif %}</a>)</span>
+{% endif %}
+{% for pair in cl.params.items %}
+    {% if pair.0 != search_var %}<input type="hidden" name="{{ pair.0 }}" value="{{ pair.1 }}"/>{% endif %}
+{% endfor %}
+</div>
+</form></div>
+{% endif %}
+Felix: The file is submit_line.html, num is 32 
+
+{% load i18n admin_urls %}
+<div class="submit-row">
+{% if show_save %}<input type="submit" value="{% trans 'Save' %}" class="default" name="_save" />{% endif %}
+{% if show_delete_link %}
+    {% url opts|admin_urlname:'delete' original.pk|admin_urlquote as delete_url %}
+    <p class="deletelink-box"><a href="{% add_preserved_filters delete_url %}" class="deletelink">{% trans "Delete" %}</a></p>
+{% endif %}
+{% if show_save_as_new %}<input type="submit" value="{% trans 'Save as new' %}" name="_saveasnew" />{% endif %}
+{% if show_save_and_add_another %}<input type="submit" value="{% trans 'Save and add another' %}" name="_addanother" />{% endif %}
+{% if show_save_and_continue %}<input type="submit" value="{% trans 'Save and continue editing' %}" name="_continue" />{% endif %}
+</div>
+Felix: The file is user.html, num is 33 
+
+{% extends "vrg_app/base_site.html" %}
+{% load i18n static vrg_list %}
+
+{% block extrastyle %}
+  {{ block.super }}
+  <link rel="stylesheet" type="text/css" href="{% static "vrg_app/css/changelists.css" %}" />
+    <link rel="stylesheet" type="text/css" href="{% static "vrg_app/css/forms.css" %}" />
+  {{ media.css }}
+  {% if not actions_on_top and not actions_on_bottom %}
+    <style>
+      #changelist table thead th:first-child {width: inherit}
+    </style>
+  {% endif %}
+{% endblock %}
+
+{% block extrahead %}
+{{ block.super }}
+{{ media.js }}
+{% endblock %}
+
+
+{% if not is_popup %}
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+<a href="{% url 'vrg_app:index' %}">{% trans 'Home' %}</a>
+&rsaquo; <a href="{% url 'vrg_app:user' owner.id %}">User</a>
+&rsaquo; {{ owner.username|capfirst }}
+</div>
+{% endblock %}
+{% endif %}
+
+{% block coltype %}flex{% endblock %}
+
+{% block content %}
+    <form id="changelist-form" method="post" enctype="multipart/form-data" novalidate>{% csrf_token %}
+    <div class="results">
+    <table id="result_list">
+	<thead>
+	    <tr>
+		{% for header in result_headers %}
+		<th scope="col" class="sortable column-type">
+		<div class="text">{{ header.text|capfirst }}</div>
+		<div class="clear"></div>
+		</th>{% endfor %}
+	    </tr>
+	</thead>
+{% if results %}
+	<tbody>
+	    {% for result in results %}
+		<tr class="{% cycle 'row1' 'row2' %}">{% for item in result %}{{ item }}{% endfor %}</tr>
+	    {% endfor %}
+	</tbody>
+    </table>
+    </div>
+{% endif %}
+
+
+    </form>
+{% endblock %}
+Felix: The file is vector.html, num is 34 
+
+{% extends "vrg_app/base_site.html" %}
+{% load i18n static %}
+
+{% block extrastyle %}
+  {{ block.super }}
+  <link rel="stylesheet" type="text/css" href="{% static "vrg_app/css/changelists.css" %}" />
+  <link rel="stylesheet" type="text/css" href="{% static "vrg_app/css/forms.css" %}" />
+  {{ media.css }}
+  {% if not actions_on_top and not actions_on_bottom %}
+    <style>
+      #changelist table thead th:first-child {width: inherit}
+    </style>
+  {% endif %}
+{% endblock %}
+
+{% block extrahead %}
+{{ block.super }}
+{{ media.js }}
+{% endblock %}
+
+
+{% if not is_popup %}
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+<a href="{% url 'vrg_app:index' %}">{% trans 'Home' %}</a>
+&rsaquo; <a href="{% url 'vrg_app:user' vector.bugowner_id %}">{{vector.bugowner|capfirst}}</a>
+&rsaquo; <a href="{% url 'vrg_app:vector' vector.id %}">vector</a>
+&rsaquo; {{ vector.vector|capfirst }}
+</div>
+{% endblock %}
+{% endif %}
+
+{% block coltype %}flex{% endblock %}
+
+{% block content %}
+    <form id="changelist-form" method="post" enctype="multipart/form-data" novalidate>{% csrf_token %}
+    {% block field_sets %}
+    {% for fieldset in vrg_form %}
+      {% include "vrg_app/includes/fieldset.html" %}
+    {% endfor %}
+    {% endblock %}
+     <fieldset class="module aligned ">
+    
+    <div class="results">
+    <h2>COMMENTS</h2>
+    <table id="result_list">
+	<thead>
+	    <tr>
+		<th scope="col" class="sortable column-type">
+		<div class="text">Index</div>
+		<div class="clear"></div>
+		</th>
+		<th scope="col" class="sortable column-type">
+		<div class="text">Create</div>
+		<div class="clear"></div>
+		</th>
+		<th scope="col" class="sortable column-type">
+		<div class="text">Author</div>
+		<div class="clear"></div>
+		</th>
+		<th scope="col" class="sortable column-type">
+		<div class="text">Content</div>
+		<div class="clear"></div>
+		</th>
+	    </tr>
+	</thead>
+	<tbody>
+	    {% for comment in vector.comment_set.all %}
+	    <tr class="{% cycle 'row1' 'row2' %}">
+		<td>{{forloop.counter}}</td>
+		<td>{{comment.add_time}}</td>
+		<td>{{comment.Assignee}}</td>
+		<td>{{comment.content|linebreaks}}</td>
+	    </tr>
+	    {% endfor %}
+	</tbody>
+    </table>
+    </div>
+
+{% if user.is_active and user.id == vector.bugowner_id %}   
+    {% for fieldset in action_form %}
+      {% include "vrg_app/includes/fieldset.html" %}
+      {% endfor %}
+    <h2>ACTIONS</h2>
+    <div class="form-row field-type">
+    <div>
+	<label class="required" for="id_author">Author:</label>
+	<select id="id_author" name="author" required>
+	    {% for u in users %}
+	    <option value="{{u.id}}" {% ifequal u.id vector.bugowner_id %}selected="selected"{% endifequal %} >{{u.username}}</option>
+	    {% endfor %}
+	</select>
+    </div>
+    </div>
+
+    <div class="form-row field-type">
+    <div>
+	<label class="required" for="id_content">Content:</label>
+	<textarea class="vLargeTextField" cols="40" id="id_content" maxlength="900" name="content" rows="10"></textarea>
+    </div>
+    </div>
+
+</fieldset>
+
+<div class="submit-row">
+<input type="submit" value="Submit" class="default" name="_save" />
+</div>
+
+
+{% endif %}
+
+</form>
+
+{% endblock %}
+Felix: The file is workspace.html, num is 35 
+
+{% extends "verification_tracking/base_site.html" %}
+{% load i18n static %}
+
+{% block extrastyle %}
+  {{ block.super }}
+  <link rel="stylesheet" type="text/css" href="{% static "verification_tracking/css/changelists.css" %}" />
+  <link rel="stylesheet" type="text/css" href="{% static "verification_tracking/css/forms.css" %}" />
+  {{ media.css }}
+  {% if not actions_on_top and not actions_on_bottom %}
+    <style>
+      #changelist table thead th:first-child {width: inherit}
+    </style>
+  {% endif %}
+{% endblock %}
+
+{% block extrahead %}
+{{ block.super }}
+{{ media.js }}
+{% endblock %}
+
+
+{% if not is_popup %}
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+<a href="{% url 'verification_tracking:index' %}">{% trans 'Home' %}</a>
+</div>
+{% endblock %}
+{% endif %}
+
+{% block coltype %}flex{% endblock %}
+
+{% block content %}
+
+    <div class="results">
+    <h2>Pending Task</h2>
+    <table id="result_list">
+	<thead>
+	    <tr>
+		<th scope="col" class="sortable column-type">
+		<div class="text">Index</div>
+		<div class="clear"></div>
+		</th>
+		<th scope="col" class="sortable column-type">
+		<div class="text">Feature Type</div>
+		<div class="clear"></div>
+        </th>
+		<th scope="col" class="sortable column-type">
+		<div class="text">Feature Point</div>
+		<div class="clear"></div>
+        </th>
+        <th scope="col" class="sortable column-type">
+		<div class="text">Feature_tatus</div>
+		<div class="clear"></div>
+		</th>
+        <th scope="col" class="sortable column-type">
+		<div class="text">Cover_status</div>
+		<div class="clear"></div>
+		</th>
+        <th scope="col" class="sortable column-type">
+		<div class="text">Stimulus_status</div>
+		<div class="clear"></div>
+		</th>
+        <th scope="col" class="sortable column-type">
+		<div class="text">Check_way_status</div>
+		<div class="clear"></div>
+		</th>
+		<th scope="col" class="sortable column-type">
+		<div class="text">Add time</div>
+		<div class="clear"></div>
+		</th>
+		<th scope="col" class="sortable column-type">
+		<div class="text">Modified time</div>
+		<div class="clear"></div>
+		</th>
+	    </tr>
+	</thead>
+	<tbody>
+	    {% for feature in features %}
+	    <tr class="{% cycle 'row1' 'row2' %}">
+		<td>{{forloop.counter}}</td>
+        <td><a href={% url 'verification_tracking:feature' feature.feature.id %}>{{feature.feature.name}}</a></td>
+        <td><a href={% url 'verification_tracking:point' feature.id %}>{{feature.name}}</a></td>
+        
+         {% if feature.get_feature_status_display == '100%' %}
+            <td bgcolor="#D6EAF8"><font color="#1B4F72">{{feature.get_feature_status_display}}</font></td>
+        {% else %}
+            <td>{{feature.get_feature_status_display}}</td>
+        {% endif%}
+
+        {% if feature.get_cover_status_display == '100%' %}
+            <td bgcolor="#D6EAF8"><font color="#1B4F72">{{feature.get_cover_status_display}}</font></td>
+        {% else %}
+		    <td>{{feature.get_cover_status_display}}</td>
+        {% endif%}
+
+        {% if feature.get_stimulus_status_display == '100%' %}
+            <td bgcolor="#D6EAF8"><font color="#1B4F72">{{feature.get_stimulus_status_display}}</font></td>
+        {% else %}
+		    <td>{{feature.get_stimulus_status_display}}</td>
+        {% endif%}
+
+        {% if feature.get_check_way_status_display == '100%' %}
+            <td bgcolor="#D6EAF8"><font color="#1B4F72">{{feature.get_check_way_status_display}}</font></td>
+        {% else %}
+		    <td>{{feature.get_check_way_status_display}}</td>
+        {% endif%}
+
+		<td>{{feature.add_time|date:"m-d" }}</td>
+		<td>{{feature.modified_time|date:"m-d" }}</td>
+	    </tr>
+	    {% endfor %}
+	</tbody>
+	</table>
+
+    </div>
+
+    
+
+{% endblock %}
+Felix: The file is status_list.html, num is 36 
+
+{% extends "verification_tracking/base_site.html" %}
+{% load i18n static %}
+
+{% block extrastyle %}
+  {{ block.super }}
+  <link rel="stylesheet" type="text/css" href="{% static "verification_tracking/css/changelists.css" %}" />
+  <link rel="stylesheet" type="text/css" href="{% static "verification_tracking/css/forms.css" %}" />
+  {{ media.css }}
+  {% if not actions_on_top and not actions_on_bottom %}
+    <style>
+      #changelist table thead th:first-child {width: inherit}
+    </style>
+  {% endif %}
+{% endblock %}
+
+{% block extrahead %}
+{{ block.super }}
+{{ media.js }}
+{% endblock %}
+
+
+{% if not is_popup %}
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+<a href="{% url 'verification_tracking:index' %}">{% trans 'Home' %}</a>
+</div>
+{% endblock %}
+{% endif %}
+
+{% block coltype %}flex{% endblock %}
+
+{% block content %}
+
+   <div>
+    <table>
+    <h2>Summary</h2>
+     <thead>
+	    <tr>
+            {% for item in owner_status_header %}
+		    <th scope="col" class="sortable column-type">
+		    <div class="clear">{{ item }}</div>
+            </th>
+            {% endfor %}
+	    </tr>
+    </thead>
+    <tbody>
+        {% for item in owner_status %}
+
+	    <tr class="{% cycle 'row1' 'row2' %}">
+            <td maxlength="200">{{ item.owner}}</td>
+            <td maxlength="200">{{ item.all_task}}</td>
+            <td maxlength="200">{{ item.finished_task}}</td>
+            <td maxlength="200">{{ item.finished_status}}</td>
+	    </tr>
+        {% endfor %}
+	</tbody>
+    </table>
+    </div>
+
+<HR style="FILTER: alpha(opacity=100,finishopacity=0,style=2)" width="100%" color=#417690 SIZE=3>
+
+    <div class="results">
+    <h2>Status</h2>
+    <table id="result_list">
+	<thead>
+	    <tr>
+		<th scope="col" class="sortable column-type">
+		<div class="text">Index</div>
+		<div class="clear"></div>
+		</th>
+		<th scope="col" class="sortable column-type">
+		<div class="text">Feature Type</div>
+		<div class="clear"></div>
+        </th>
+		<th scope="col" class="sortable column-type">
+		<div class="text">Feature Point</div>
+		<div class="clear"></div>
+        </th>
+        <th scope="col" class="sortable column-type">
+		<div class="text">Feature_tatus</div>
+		<div class="clear"></div>
+		</th>
+        <th scope="col" class="sortable column-type">
+		<div class="text">Cover_status</div>
+		<div class="clear"></div>
+		</th>
+        <th scope="col" class="sortable column-type">
+		<div class="text">Stimulus_status</div>
+		<div class="clear"></div>
+		</th>
+        <th scope="col" class="sortable column-type">
+		<div class="text">Check_way_status</div>
+		<div class="clear"></div>
+		</th>
+		<th scope="col" class="sortable column-type">
+		<div class="text">Add time</div>
+		<div class="clear"></div>
+		</th>
+		<th scope="col" class="sortable column-type">
+		<div class="text">Modified time</div>
+		<div class="clear"></div>
+		</th>
+	    </tr>
+	</thead>
+	<tbody>
+	    {% for feature in features %}
+	    <tr class="{% cycle 'row1' 'row2' %}">
+		<td>{{forloop.counter}}</td>
+        <td><a href={% url 'verification_tracking:feature' feature.feature.id %}>{{feature.feature.name}}</a></td>
+        <td><a href={% url 'verification_tracking:point' feature.id %}>{{feature.name}}</a></td>
+
+        {% if feature.get_feature_status_display == '100%' %}
+            <td bgcolor="#D6EAF8"><font color="#1B4F72">{{feature.get_feature_status_display}}</font></td>
+        {% else %}
+            <td>{{feature.get_feature_status_display}}</td>
+        {% endif%}
+
+        {% if feature.get_cover_status_display == '100%' %}
+            <td bgcolor="#D6EAF8"><font color="#1B4F72">{{feature.get_cover_status_display}}</font></td>
+        {% else %}
+		    <td>{{feature.get_cover_status_display}}</td>
+        {% endif%}
+
+        {% if feature.get_stimulus_status_display == '100%' %}
+            <td bgcolor="#D6EAF8"><font color="#1B4F72">{{feature.get_stimulus_status_display}}</font></td>
+        {% else %}
+		    <td>{{feature.get_stimulus_status_display}}</td>
+        {% endif%}
+
+        {% if feature.get_check_way_status_display == '100%' %}
+            <td bgcolor="#D6EAF8"><font color="#1B4F72">{{feature.get_check_way_status_display}}</font></td>
+        {% else %}
+		    <td>{{feature.get_check_way_status_display}}</td>
+        {% endif%}
+
+		<td>{{feature.add_time|date:"m-d" }}</td>
+		<td>{{feature.modified_time|date:"m-d" }}</td>
+	    </tr>
+	    {% endfor %}
+	</tbody>
+	</table>
+
+    </div>
+
+    
+
+{% endblock %}
+Felix: The file is cross_check.html, num is 37 
+
+{% extends "verification_tracking/base_site.html" %}
+{% load i18n static %}
+
+{% block extrastyle %}
+  {{ block.super }}
+  <link rel="stylesheet" type="text/css" href="{% static "verification_tracking/css/changelists.css" %}" />
+  <link rel="stylesheet" type="text/css" href="{% static "verification_tracking/css/forms.css" %}" />
+  {{ media.css }}
+  {% if not actions_on_top and not actions_on_bottom %}
+    <style>
+      #changelist table thead th:first-child {width: inherit}
+    </style>
+  {% endif %}
+{% endblock %}
+
+{% block extrahead %}
+{{ block.super }}
+{{ media.js }}
+{% endblock %}
+
+
+{% if not is_popup %}
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+<a href="{% url 'verification_tracking:index' %}">{% trans 'Home' %}</a>
+</div>
+{% endblock %}
+{% endif %}
+
+{% block coltype %}flex{% endblock %}
+
+{% block content %}
+
+   <div id="cross_check_summary" class="module">
+    <table>
+    <caption>
+	<a >Checker </a>
+    </caption>
+     <thead>
+	    <tr>
+            {% for item in header %}
+		    <th scope="col" class="sortable column-type">
+		    <div class="clear">{{ item }}</div>
+            </th>
+            {% endfor %}
+	    </tr>
+    </thead>
+    <tbody>
+        {% for item in checker_check_result_set %}
+
+	    <tr class="{% cycle 'row1' 'row2' %}">
+	        <th scope="row" text-align="left"><a href="{% url 'verification_tracking:cross_check_result_by_owner' pk=item.pk type=item.type%}"><font color="#417690">{{item.owner}}</font></a></th>
+            <td maxlength="200">{{ item.total_cnt}}</td>
+            <td maxlength="200">{{ item.miss_cnt}}</td>
+            {#<td maxlength="200">{{ item.miss_rate}}</td>#}
+            <td maxlength="200"><a href="{% url 'verification_tracking:cross_check_result_by_owner' pk=item.pk type=item.type%}"><font color="#417690">{{ item.miss_rate}}</font></a></td>
+	    </tr>
+        {% endfor %}
+	</tbody>
+    </table>
+    </div>
+
+   <div id="cross_check_summary" class="module">
+    <table>
+    <caption>
+	<a >Cover sva </a>
+    </caption>
+     <thead>
+	    <tr>
+            {% for item in header %}
+		    <th scope="col" class="sortable column-type">
+		    <div class="clear">{{ item }}</div>
+            </th>
+            {% endfor %}
+	    </tr>
+    </thead>
+    <tbody>
+        {% for item in cover_sva_check_result_set %}
+
+	    <tr class="{% cycle 'row1' 'row2' %}">
+	        <th scope="row" text-align="left"><a href="{% url 'verification_tracking:cross_check_result_by_owner' pk=item.pk type=item.type%}"><font color="#417690">{{item.owner}}</font></a></th>
+            <td maxlength="200">{{ item.total_cnt}}</td>
+            <td maxlength="200">{{ item.miss_cnt}}</td>
+            {#<td maxlength="200">{{ item.miss_rate}}</td>#}
+            <td maxlength="200"><a href="{% url 'verification_tracking:cross_check_result_by_owner' pk=item.pk type=item.type%}"><font color="#417690">{{ item.miss_rate}}</font></a></td>
+	    </tr>
+        {% endfor %}
+	</tbody>
+    </table>
+    </div>
+
+   <div id="cross_check_summary" class="module">
+    <table>
+    <caption>
+	<a >Single Socket Stimulus </a>
+    </caption>
+     <thead>
+	    <tr>
+            {% for item in header %}
+		    <th scope="col" class="sortable column-type">
+		    <div class="clear">{{ item }}</div>
+            </th>
+            {% endfor %}
+	    </tr>
+    </thead>
+    <tbody>
+        {% for item in stimulus_check_result_set %}
+
+	    <tr class="{% cycle 'row1' 'row2' %}">
+	        <th scope="row" text-align="left"><a href="{% url 'verification_tracking:cross_check_result_by_owner' pk=item.pk type=item.type%}"><font color="#417690">{{item.owner}}</font></a></th>
+            <td maxlength="200">{{ item.total_cnt}}</td>
+            <td maxlength="200">{{ item.miss_cnt}}</td>
+            {#<td maxlength="200">{{ item.miss_rate}}</td>#}
+            <td maxlength="200"><a href="{% url 'verification_tracking:cross_check_result_by_owner' pk=item.pk type=item.type%}"><font color="#417690">{{ item.miss_rate}}</font></a></td>
+	    </tr>
+        {% endfor %}
+	</tbody>
+    </table>
+    </div>
+    
+   <div id="cross_check_summary" class="module">
+    <table>
+    <caption>
+	<a >Dual Socket Stimulus </a>
+    </caption>
+     <thead>
+	    <tr>
+            {% for item in header %}
+		    <th scope="col" class="sortable column-type">
+		    <div class="clear">{{ item }}</div>
+            </th>
+            {% endfor %}
+	    </tr>
+    </thead>
+    <tbody>
+        {% for item in stimulus_dual_check_result_set %}
+
+	    <tr class="{% cycle 'row1' 'row2' %}">
+	        <th scope="row" text-align="left"><a href="{% url 'verification_tracking:cross_check_result_by_owner' pk=item.pk type=item.type%}"><font color="#417690">{{item.owner}}</font></a></th>
+            <td maxlength="200">{{ item.total_cnt}}</td>
+            <td maxlength="200">{{ item.miss_cnt}}</td>
+            {#<td maxlength="200">{{ item.miss_rate}}</td>#}
+            <td maxlength="200"><a href="{% url 'verification_tracking:cross_check_result_by_owner' pk=item.pk type=item.type%}"><font color="#417690">{{ item.miss_rate}}</font></a></td>
+	    </tr>
+        {% endfor %}
+	</tbody>
+    </table>
+</div>
+
+   <div id="cross_check_summary" class="module">
+    <table>
+    <caption>
+	<a >Class regiester status </a>
+    </caption>
+     <thead>
+	    <tr>
+            {% for item in header %}
+		    <th scope="col" class="sortable column-type">
+		    <div class="clear">{{ item }}</div>
+            </th>
+            {% endfor %}
+	    </tr>
+    </thead>
+    <tbody>
+        {% for item in class_register_check_result_set %}
+
+	    <tr class="{% cycle 'row1' 'row2' %}">
+	        <th scope="row" text-align="left"><a href="{% url 'verification_tracking:cross_check_result_by_owner' pk=item.pk type=item.type%}"><font color="#417690">{{item.owner}}</font></a></th>
+            <td maxlength="200">{{ item.total_cnt}}</td>
+            <td maxlength="200">{{ item.miss_cnt}}</td>
+            {#<td maxlength="200">{{ item.miss_rate}}</td>#}
+            <td maxlength="200"><a href="{% url 'verification_tracking:cross_check_result_by_owner' pk=item.pk type=item.type%}"><font color="#417690">{{ item.miss_rate}}</font></a></td>
+	    </tr>
+        {% endfor %}
+	</tbody>
+    </table>
+    </div>
+{% endblock %}
+Felix: The file is coverage_trace.html, num is 38 
+
+{% extends "verification_tracking/base_site.html" %}
+{% load i18n static %}
+
+{% block extrastyle %}
+  {{ block.super }}
+  <link rel="stylesheet" type="text/css" href="{% static "verification_tracking/css/changelists.css" %}" />
+  <link rel="stylesheet" type="text/css" href="{% static "verification_tracking/css/forms.css" %}" />
+  {{ media.css }}
+  {% if not actions_on_top and not actions_on_bottom %}
+    <style>
+      #changelist table thead th:first-child {width: inherit}
+    </style>
+  {% endif %}
+{% endblock %}
+
+{% block extrahead %}
+{{ block.super }}
+{{ media.js }}
+{% endblock %}
+
+
+{% if not is_popup %}
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+<a href="{% url 'verification_tracking:index' %}">{% trans 'Home' %}</a>
+</div>
+{% endblock %}
+{% endif %}
+
+{% block coltype %}flex{% endblock %}
+
+{% block content %}
+
+<HR style="FILTER: alpha(opacity=100,finishopacity=0,style=2)" width="100%" color=#417690 SIZE=3>
+
+<div>
+        <p> {{publish_date}} </p>
+        <h2> Feature coverage result </h2>
+    <table>
+    <caption>
+    </caption>
+     <thead>
+	    <tr>
+            {% for item in status_header %}
+		    <th scope="col" class="sortable column-type">
+		    <div class="clear">{{ item }}</div>
+            </th>
+            {% endfor %}
+	    </tr>
+    </thead>
+    <tbody>
+        {% for item in status_list %}
+
+	    <tr class="{% cycle 'row1' 'row2' %}">
+	        <th scope="row" text-align="left"><font color="#417690">{{item.num}}</font></th>
+            {#<td maxlength="200"><a href="{% url 'verification_tracking:point' pk=item.pk %}"><font color="#417690">{{ item.pk}}</font></a></td>#}
+            <td maxlength="200">{{ item.module}}</td>
+            <td maxlength="200">{{ item.coverage}}</td>
+            <td maxlength="200">{{ item.status}}</td>
+	    </tr>
+        {% endfor %}
+	</tbody>
+    </table>
+    </div>
+
+<HR style="FILTER: alpha(opacity=100,finishopacity=0,style=2)" width="100%" color=#417690 SIZE=3>
+
+    <div class="results">
+        <h2>coverage trace result</h2>
+    <table id="result_list">
+	<thead>
+	    <tr>
+		<th scope="col" class="sortable column-type">
+		<div class="text">Index</div>
+		<div class="clear"></div>
+        </th>
+		<th scope="col" class="sortable column-type">
+		<div class="text">Feature Type</div>
+		<div class="clear"></div>
+        </th>
+		<th scope="col" class="sortable column-type">
+		<div class="text">Feature Point</div>
+		<div class="clear"></div>
+        </th>
+    	<th scope="col" class="sortable column-type">
+		<div class="text">Cover Sva Name</div>
+		<div class="clear"></div>
+		</th>
+		<th scope="col" class="sortable column-type">
+		<div class="text">Stimulus name</div>
+		<div class="clear"></div>
+        </th>
+        <th scope="col" class="sortable column-type">
+		<div class="text">Stimulus status</div>
+		<div class="clear"></div>
+		</th>
+        <th scope="col" class="sortable column-type">
+		<div class="text">vrg_register_status</div>
+		<div class="clear"></div>
+        </th>
+        <th scope="col" class="sortable column-type">
+		<div class="text">stimulus_random_status</div>
+		<div class="clear"></div>
+        </th>
+        <th scope="col" class="sortable column-type">
+		<div class="text">Stimulus_owner</div>
+		<div class="clear"></div>
+        </th>
+		<th scope="col" class="sortable column-type">
+		<div class="text">Cover_sva_owner</div>
+		<div class="clear"></div>
+		</th>
+	    </tr>
+	</thead>
+	<tbody>
+	    {% for element in set %}
+	    <tr class="{% cycle 'row1' 'row2' %}">
+		<td>{{forloop.counter}}</td>
+
+        <td><a href={% url 'verification_tracking:feature' element.vp.feature.id %}>{{element.vp.feature.name}}</a></td>
+        <td><a href={% url 'verification_tracking:point' element.vp.id %}>{{element.vp.name}}</a></td>
+		<td>{{element.cover_sva_name}}</td>
+		<td>{{element.vp.stimulus_single}}</td>
+
+        {% if element.vp.get_stimulus_status_display == '100%' %}
+		    <td>{{element.vp.get_stimulus_status_display}}</td>
+        {% else %}
+            <td bgcolor="#E6B0AA"><font color="#6A1E16">{{element.vp.get_stimulus_status_display}}</font></td>
+        {% endif %}
+
+        {% if element.vp.get_stimulus_status_display != '100%' or element.vp.get_vrg_register_status_display == 'registered' %}
+		    <td>{{element.vp.get_vrg_register_status_display}}</td>
+        {% else %}
+            <td bgcolor="#E6B0AA"><font color="#6A1E16">{{element.vp.get_vrg_register_status_display}}</font></td>
+        {% endif %}
+
+        {% if element.vp.get_stimulus_status_display != '100%' or element.vp.get_stimulus_covered_status_display == 'randomed' %}
+		    <td>{{element.vp.get_stimulus_covered_status_display}}</td>
+        {% else %}
+            <td bgcolor="#E6B0AA"><font color="#6A1E16">{{element.vp.get_stimulus_covered_status_display}}</font></td>
+        {% endif %}
+
+        {% if element.vp.get_stimulus_status_display != '100%' or element.vp.get_vrg_register_status_display != 'registered' %}
+		    <td bgcolor="#E6B0AA"><font color="#6A1E16">{{element.vp.stimulus_owner}}</font></td>
+        {% else %}
+		    <td>{{element.vp.stimulus_owner}}</td>
+        {% endif %}
+
+        {% if element.vp.get_stimulus_status_display == '100%' and element.vp.get_vrg_register_status_display == 'registered' and element.vp.get_stimulus_covered_status_display == 'randomed' %}
+		    <td bgcolor="#E6B0AA"><font color="#6A1E16">{{element.vp.cover_sva_owner}}</font></td>
+        {% else %}
+		    <td>{{element.vp.cover_sva_owner}}</td>
+        {% endif %}
+        {#{% if element.vp.get_check_way_status_display == '100%' %}#}
+        {#    <td bgcolor="#D6EAF8"><font color="#1B4F72">{{element.vp.get_check_way_status_display}}</font></td>#}
+        {#{% else %}#}
+		{#    <td>{{element.vp.get_check_way_status_display}}</td>#}
+        {#{% endif%}#}
+
+        {#<td>{{element.vp.add_time|date:"m-d" }}</td>#}
+	    </tr>
+	    {% endfor %}
+	</tbody>
+	</table>
+
+    </div>
+
+    
+<HR style="FILTER: alpha(opacity=100,finishopacity=0,style=2)" width="100%" color=#417690 SIZE=3>
+
+<div>
+        <h2> Cover sva not found in VP web </h2>
+    <table>
+    <caption>
+    </caption>
+     <thead>
+	    <tr>
+            {% for item in header %}
+		    <th scope="col" class="sortable column-type">
+		    <div class="clear">{{ item }}</div>
+            </th>
+            {% endfor %}
+	    </tr>
+    </thead>
+    <tbody>
+        {% for item in unexisted_cover_sva_list %}
+
+	    <tr class="{% cycle 'row1' 'row2' %}">
+	        <th scope="row" text-align="left"><font color="#417690">{{item.num}}</font></th>
+            {#<td maxlength="200"><a href="{% url 'verification_tracking:point' pk=item.pk %}"><font color="#417690">{{ item.pk}}</font></a></td>#}
+            <td maxlength="200">{{ item.cover_sva_name}}</td>
+	    </tr>
+        {% endfor %}
+	</tbody>
+    </table>
+    </div>
+
+
+{% endblock %}
+Felix: The file is cross_check_by_owner.html, num is 39 
+
+{% extends "verification_tracking/base_site.html" %}
+{% load i18n static %}
+
+{% block extrastyle %}
+  {{ block.super }}
+  <link rel="stylesheet" type="text/css" href="{% static "verification_tracking/css/changelists.css" %}" />
+  <link rel="stylesheet" type="text/css" href="{% static "verification_tracking/css/forms.css" %}" />
+  {{ media.css }}
+  {% if not actions_on_top and not actions_on_bottom %}
+    <style>
+      #changelist table thead th:first-child {width: inherit}
+    </style>
+  {% endif %}
+{% endblock %}
+
+{% block extrahead %}
+{{ block.super }}
+{{ media.js }}
+{% endblock %}
+
+
+{% if not is_popup %}
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+<a href="{% url 'verification_tracking:index' %}">{% trans 'Home' %}</a>
+</div>
+{% endblock %}
+{% endif %}
+
+{% block coltype %}flex{% endblock %}
+
+{% block content %}
+
+<h2>{{owner}}`s mismatch for {{type}}</h2>
+
+   <div>
+    <table>
+    <caption>
+    </caption>
+     <thead>
+	    <tr>
+            {% for item in header %}
+		    <th scope="col" class="sortable column-type">
+		    <div class="clear">{{ item }}</div>
+            </th>
+            {% endfor %}
+	    </tr>
+    </thead>
+    <tbody>
+        {% for item in set %}
+
+	    <tr class="{% cycle 'row1' 'row2' %}">
+	        <th scope="row" text-align="left"><font color="#417690">{{item.num}}</font></th>
+            <td maxlength="200"><a href="{% url 'verification_tracking:point' pk=item.pk %}"><font color="#417690">{{ item.pk}}</font></a></td>
+            <td maxlength="200"><a href="{% url 'verification_tracking:point' pk=item.pk %}"><font color="#417690">{{ item.name}}</font></a></td>
+            <td maxlength="200">{{ item.content}}</td>
+	    </tr>
+        {% endfor %}
+	</tbody>
+    </table>
+    </div>
+
+{% endblock %}
+Felix: The file is register_status.html, num is 40 
+
+{% extends "verification_tracking/base_site.html" %}
+{% load i18n static %}
+
+{% block extrastyle %}
+  {{ block.super }}
+  <link rel="stylesheet" type="text/css" href="{% static "verification_tracking/css/changelists.css" %}" />
+  <link rel="stylesheet" type="text/css" href="{% static "verification_tracking/css/forms.css" %}" />
+  {{ media.css }}
+  {% if not actions_on_top and not actions_on_bottom %}
+    <style>
+      #changelist table thead th:first-child {width: inherit}
+    </style>
+  {% endif %}
+{% endblock %}
+
+{% block extrahead %}
+{{ block.super }}
+{{ media.js }}
+{% endblock %}
+
+
+{% if not is_popup %}
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+<a href="{% url 'verification_tracking:index' %}">{% trans 'Home' %}</a>
+</div>
+{% endblock %}
+{% endif %}
+
+{% block coltype %}flex{% endblock %}
+
+{% block content %}
+
+   <div id="cross_check_summary" class="module">
+    <table>
+    <caption>
+	<a >Class regiester status </a>
+    </caption>
+     <thead>
+	    <tr>
+            {% for item in header %}
+		    <th scope="col" class="sortable column-type">
+		    <div class="clear">{{ item }}</div>
+            </th>
+            {% endfor %}
+	    </tr>
+    </thead>
+    <tbody>
+        {% for item in class_register_check_result_set %}
+
+	    <tr class="{% cycle 'row1' 'row2' %}">
+	        <th scope="row" text-align="left"><a href="{% url 'verification_tracking:cross_check_result_by_owner' pk=item.pk type=item.type%}"><font color="#417690">{{item.owner}}</font></a></th>
+            <td maxlength="200">{{ item.total_cnt}}</td>
+            <td maxlength="200">{{ item.miss_cnt}}</td>
+            {#<td maxlength="200">{{ item.miss_rate}}</td>#}
+            <td maxlength="200"><a href="{% url 'verification_tracking:cross_check_result_by_owner' pk=item.pk type=item.type%}"><font color="#417690">{{ item.miss_rate}}</font></a></td>
+	    </tr>
+        {% endfor %}
+	</tbody>
+    </table>
+    </div>
+
+{% endblock %}
+Felix: The file is coverage_count.html, num is 41 
+
+{% extends "verification_tracking/base_site.html" %}
+{% load i18n static %}
+
+{% block extrastyle %}
+  {{ block.super }}
+  <link rel="stylesheet" type="text/css" href="{% static "verification_tracking/css/changelists.css" %}" />
+  <link rel="stylesheet" type="text/css" href="{% static "verification_tracking/css/forms.css" %}" />
+  {{ media.css }}
+  {% if not actions_on_top and not actions_on_bottom %}
+    <style>
+      #changelist table thead th:first-child {width: inherit}
+    </style>
+  {% endif %}
+{% endblock %}
+
+{% block extrahead %}
+{{ block.super }}
+{{ media.js }}
+{% endblock %}
+
+
+{% if not is_popup %}
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+<a href="{% url 'verification_tracking:index' %}">{% trans 'Home' %}</a>
+</div>
+{% endblock %}
+{% endif %}
+
+{% block coltype %}flex{% endblock %}
+
+{% block content %}
+
+<HR style="FILTER: alpha(opacity=100,finishopacity=0,style=2)" width="100%" color=#417690 SIZE=3>
+
+    <div class="results">
+        <h2>coverage trace result</h2>
+    <table id="result_list">
+	<thead>
+	    <tr>
+		<th scope="col" class="sortable column-type">
+		<div class="text">Index</div>
+		<div class="clear"></div>
+		</th>
+		<th scope="col" class="sortable column-type">
+		<div class="text">Feature Type</div>
+		<div class="clear"></div>
+        </th>
+		<th scope="col" class="sortable column-type">
+		<div class="text">Feature Point</div>
+		<div class="clear"></div>
+        </th>
+		<th scope="col" class="sortable column-type">
+		<div class="text">Stimulus name</div>
+		<div class="clear"></div>
+        </th>
+        <th scope="col" class="sortable column-type">
+		<div class="text">Stimulus status</div>
+		<div class="clear"></div>
+		</th>
+        <th scope="col" class="sortable column-type">
+		<div class="text">vrg_register_status</div>
+		<div class="clear"></div>
+        </th>
+        <th scope="col" class="sortable column-type">
+		<div class="text">stimulus_random_status</div>
+		<div class="clear"></div>
+        </th>
+        <th scope="col" class="sortable column-type">
+		<div class="text">Stimulus_owner</div>
+		<div class="clear"></div>
+        </th>
+		<th scope="col" class="sortable column-type">
+		<div class="text">Cover_count</div>
+		<div class="clear"></div>
+		</th>
+	    </tr>
+	</thead>
+	<tbody>
+	    {% for feature in features %}
+	    <tr class="{% cycle 'row1' 'row2' %}">
+		<td>{{forloop.counter}}</td>
+        <td><a href={% url 'verification_tracking:feature' feature.feature.id %}>{{feature.feature.name}}</a></td>
+        <td><a href={% url 'verification_tracking:point' feature.id %}>{{feature.name}}</a></td>
+		<td>{{feature.stimulus_single}}</td>
+
+        {% if feature.get_stimulus_status_display == '100%' %}
+		    <td>{{feature.get_stimulus_status_display}}</td>
+        {% else %}
+            <td bgcolor="#E6B0AA"><font color="#6A1E16">{{feature.get_stimulus_status_display}}</font></td>
+        {% endif %}
+
+        {% if feature.get_stimulus_status_display != '100%' or feature.get_vrg_register_status_display == 'registered' %}
+		    <td>{{feature.get_vrg_register_status_display}}</td>
+        {% else %}
+            <td bgcolor="#E6B0AA"><font color="#6A1E16">{{feature.get_vrg_register_status_display}}</font></td>
+        {% endif %}
+
+        {% if feature.get_stimulus_status_display != '100%' or feature.get_stimulus_covered_status_display == 'randomed' %}
+		    <td>{{feature.get_stimulus_covered_status_display}}</td>
+        {% else %}
+            <td bgcolor="#E6B0AA"><font color="#6A1E16">{{feature.get_stimulus_covered_status_display}}</font></td>
+        {% endif %}
+
+        {% if feature.get_stimulus_status_display != '100%' or feature.get_vrg_register_status_display != 'registered' %}
+		    <td bgcolor="#E6B0AA"><font color="#6A1E16">{{feature.stimulus_owner}}</font></td>
+        {% else %}
+		    <td>{{feature.stimulus_owner}}</td>
+        {% endif %}
+
+        {% if feature.vp_cover_count <= 20 %}
+		    <td bgcolor="#E6B0AA"><font color="#6A1E16">{{feature.vp_cover_count}}</font></td>
+        {% else %}
+		    <td>{{feature.vp_cover_count}}</td>
+        {% endif %}
+        {#{% if feature.get_check_way_status_display == '100%' %}#}
+        {#    <td bgcolor="#D6EAF8"><font color="#1B4F72">{{feature.get_check_way_status_display}}</font></td>#}
+        {#{% else %}#}
+		{#    <td>{{feature.get_check_way_status_display}}</td>#}
+        {#{% endif%}#}
+
+        {#<td>{{feature.add_time|date:"m-d" }}</td>#}
+	    </tr>
+	    {% endfor %}
+	</tbody>
+	</table>
+
+    </div>
+
+    
+
+
+
+{% endblock %}
+Felix: The file is gazer.html, num is 42 
+
+{% extends "verification_tracking/base_site.html" %}
+{% load i18n static %}
+
+{% block extrastyle %}
+
+<style type="text/css">
+</style>
+
+{{ block.super }}
+<link rel="stylesheet" type="text/css" href="{% static "verification_tracking/css/dashboard.css" %}" />
+<link rel="stylesheet" type="text/css" href="{% static "verification_tracking/css/tablestyle.css" %}" />
+
+{% endblock %}
+
+
+
+{% block coltype %}colMS{% endblock %}
+
+{% block bodyclass %}{{ block.super }} dashboard{% endblock %}
+
+{% block breadcrumbs %}{% endblock %}
+
+{% block content %}
+
+
+    <div>
+        <h2><a href={% url 'verification_tracking:vrg_app' %}> vrg_app </a><h2>
+        <h2><a href={% url 'verification_tracking:index' %}> verification_tracking </a><h2>
+        <h2><a href={% url 'verification_tracking:lint_app' %}> lint_app </a><h2>
+        <h2><a href={% url 'verification_tracking:signoff_app' %}> signoff_app </a><h2>
+    </div>
+{% endblock %}
+
+{% block sidebar %}
+
+{% endblock %}
+Felix: The file is coverage_trace_org.html, num is 43 
+
+{% extends "verification_tracking/base_site.html" %}
+{% load i18n static %}
+
+{% block extrastyle %}
+  {{ block.super }}
+  <link rel="stylesheet" type="text/css" href="{% static "verification_tracking/css/changelists.css" %}" />
+  <link rel="stylesheet" type="text/css" href="{% static "verification_tracking/css/forms.css" %}" />
+  {{ media.css }}
+  {% if not actions_on_top and not actions_on_bottom %}
+    <style>
+      #changelist table thead th:first-child {width: inherit}
+    </style>
+  {% endif %}
+{% endblock %}
+
+{% block extrahead %}
+{{ block.super }}
+{{ media.js }}
+{% endblock %}
+
+
+{% if not is_popup %}
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+<a href="{% url 'verification_tracking:index' %}">{% trans 'Home' %}</a>
+</div>
+{% endblock %}
+{% endif %}
+
+{% block coltype %}flex{% endblock %}
+
+{% block content %}
+
+<HR style="FILTER: alpha(opacity=100,finishopacity=0,style=2)" width="100%" color=#417690 SIZE=3>
+
+<div>
+        <p> {{publish_date}} </p>
+        <h2> Feature coverage result </h2>
+    <table>
+    <caption>
+    </caption>
+     <thead>
+	    <tr>
+            {% for item in status_header %}
+		    <th scope="col" class="sortable column-type">
+		    <div class="clear">{{ item }}</div>
+            </th>
+            {% endfor %}
+	    </tr>
+    </thead>
+    <tbody>
+        {% for item in status_list %}
+
+	    <tr class="{% cycle 'row1' 'row2' %}">
+	        <th scope="row" text-align="left"><font color="#417690">{{item.num}}</font></th>
+            {#<td maxlength="200"><a href="{% url 'verification_tracking:point' pk=item.pk %}"><font color="#417690">{{ item.pk}}</font></a></td>#}
+            <td maxlength="200">{{ item.module}}</td>
+            <td maxlength="200">{{ item.coverage}}</td>
+            <td maxlength="200">{{ item.status}}</td>
+	    </tr>
+        {% endfor %}
+	</tbody>
+    </table>
+    </div>
+
+<HR style="FILTER: alpha(opacity=100,finishopacity=0,style=2)" width="100%" color=#417690 SIZE=3>
+
+    <div class="results">
+        <h2>coverage trace result</h2>
+    <table id="result_list">
+	<thead>
+	    <tr>
+		<th scope="col" class="sortable column-type">
+		<div class="text">Index</div>
+		<div class="clear"></div>
+		</th>
+		<th scope="col" class="sortable column-type">
+		<div class="text">Feature Type</div>
+		<div class="clear"></div>
+        </th>
+		<th scope="col" class="sortable column-type">
+		<div class="text">Feature Point</div>
+		<div class="clear"></div>
+        </th>
+		<th scope="col" class="sortable column-type">
+		<div class="text">Stimulus name</div>
+		<div class="clear"></div>
+        </th>
+        <th scope="col" class="sortable column-type">
+		<div class="text">Stimulus status</div>
+		<div class="clear"></div>
+		</th>
+        <th scope="col" class="sortable column-type">
+		<div class="text">vrg_register_status</div>
+		<div class="clear"></div>
+        </th>
+        <th scope="col" class="sortable column-type">
+		<div class="text">stimulus_random_status</div>
+		<div class="clear"></div>
+        </th>
+        <th scope="col" class="sortable column-type">
+		<div class="text">Stimulus_owner</div>
+		<div class="clear"></div>
+        </th>
+		<th scope="col" class="sortable column-type">
+		<div class="text">Cover_sva_owner</div>
+		<div class="clear"></div>
+		</th>
+	    </tr>
+	</thead>
+	<tbody>
+	    {% for feature in features %}
+	    <tr class="{% cycle 'row1' 'row2' %}">
+		<td>{{forloop.counter}}</td>
+        <td><a href={% url 'verification_tracking:feature' feature.feature.id %}>{{feature.feature.name}}</a></td>
+        <td><a href={% url 'verification_tracking:point' feature.id %}>{{feature.name}}</a></td>
+		<td>{{feature.stimulus_single}}</td>
+
+        {% if feature.get_stimulus_status_display == '100%' %}
+		    <td>{{feature.get_stimulus_status_display}}</td>
+        {% else %}
+            <td bgcolor="#E6B0AA"><font color="#6A1E16">{{feature.get_stimulus_status_display}}</font></td>
+        {% endif %}
+
+        {% if feature.get_stimulus_status_display != '100%' or feature.get_vrg_register_status_display == 'registered' %}
+		    <td>{{feature.get_vrg_register_status_display}}</td>
+        {% else %}
+            <td bgcolor="#E6B0AA"><font color="#6A1E16">{{feature.get_vrg_register_status_display}}</font></td>
+        {% endif %}
+
+        {% if feature.get_stimulus_status_display != '100%' or feature.get_stimulus_covered_status_display == 'randomed' %}
+		    <td>{{feature.get_stimulus_covered_status_display}}</td>
+        {% else %}
+            <td bgcolor="#E6B0AA"><font color="#6A1E16">{{feature.get_stimulus_covered_status_display}}</font></td>
+        {% endif %}
+
+        {% if feature.get_stimulus_status_display != '100%' or feature.get_vrg_register_status_display != 'registered' %}
+		    <td bgcolor="#E6B0AA"><font color="#6A1E16">{{feature.stimulus_owner}}</font></td>
+        {% else %}
+		    <td>{{feature.stimulus_owner}}</td>
+        {% endif %}
+
+        {% if feature.get_stimulus_status_display == '100%' and feature.get_vrg_register_status_display == 'registered' and feature.get_stimulus_covered_status_display == 'randomed' %}
+		    <td bgcolor="#E6B0AA"><font color="#6A1E16">{{feature.cover_sva_owner}}</font></td>
+        {% else %}
+		    <td>{{feature.cover_sva_owner}}</td>
+        {% endif %}
+        {#{% if feature.get_check_way_status_display == '100%' %}#}
+        {#    <td bgcolor="#D6EAF8"><font color="#1B4F72">{{feature.get_check_way_status_display}}</font></td>#}
+        {#{% else %}#}
+		{#    <td>{{feature.get_check_way_status_display}}</td>#}
+        {#{% endif%}#}
+
+        {#<td>{{feature.add_time|date:"m-d" }}</td>#}
+	    </tr>
+	    {% endfor %}
+	</tbody>
+	</table>
+
+    </div>
+
+    
+<HR style="FILTER: alpha(opacity=100,finishopacity=0,style=2)" width="100%" color=#417690 SIZE=3>
+
+<div>
+        <h2> Cover sva not found in VP web </h2>
+    <table>
+    <caption>
+    </caption>
+     <thead>
+	    <tr>
+            {% for item in header %}
+		    <th scope="col" class="sortable column-type">
+		    <div class="clear">{{ item }}</div>
+            </th>
+            {% endfor %}
+	    </tr>
+    </thead>
+    <tbody>
+        {% for item in unexisted_cover_sva_list %}
+
+	    <tr class="{% cycle 'row1' 'row2' %}">
+	        <th scope="row" text-align="left"><font color="#417690">{{item.num}}</font></th>
+            {#<td maxlength="200"><a href="{% url 'verification_tracking:point' pk=item.pk %}"><font color="#417690">{{ item.pk}}</font></a></td>#}
+            <td maxlength="200">{{ item.cover_sva_name}}</td>
+	    </tr>
+        {% endfor %}
+	</tbody>
+    </table>
+    </div>
+
+
+{% endblock %}

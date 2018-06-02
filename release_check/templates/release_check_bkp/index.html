@@ -1,0 +1,44 @@
+{% block content %}
+    
+    <h2> Lint result </h2>
+
+    <div id="felix">/
+        {% block feild_sets %}
+        {% for fieldset in infos %}
+            {% include "release_check/includes/fieldset1.html"%}
+        {% endfor %}
+        {% endblock %}
+    </div>
+
+{#-----------------------------------------------------------------------#}
+
+    <div id="check_design_2" class="module">
+    {% if all %}
+    <table>
+    <caption>
+    <a class="section">Lint Fail</a>
+    </caption>
+    <thead>
+        <tr>
+            {% for item in header %}
+            <th scope="col" class="sortable column-type" align="right">
+            <dir class="clear"><a>{{ item }}</a></div>
+            </th>
+            {% endfor %}
+        </tr>
+    </thead>
+    <tbody>
+        {% for item in all %}
+
+        <tr class="{% cycle 'row1' 'row2' %}">
+            <th scope="row" text-align="center"><a herf="{% 'release_check:owner' item.id %}"><font color="#417690">{{item.owner}}</font></a></th>
+            <td>{{ item.fail_number }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+    </table>
+    {% else %}
+    <h2> {{ note }} </h2>
+    {% endif %}
+    </div>
+{% endblock %}
