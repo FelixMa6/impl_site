@@ -14,13 +14,13 @@ import os
 def index(request):
 
     #list all partion
-    #partition_set = ['full_chip','processor_only','core_cluster','hif_only','fsl_only',]
-    partition_set = ['processor_only']
-    signoff_mode_set = ['normal', 'afs', 'atpg',]
+    #partition_set = ['full_chip','full_chip','core_cluster','hif_only','fsl_only',]
+    partition_set = ['full_chip']
+    signoff_mode_set = ['normal', 'atpg',]
     #signoff_mode_set = ['afs']
     check_mode_set = ['setup', 'hold']
     #partition_set = ['fsl_only']
-    #partition_set = ['core_only','processor_only']
+    #partition_set = ['core_only','full_chip']
 
     #others = TPathGroup.objects.all()
     #others = TPathGroup.objects.filter(partition='fsl_only')
@@ -151,7 +151,7 @@ def index(request):
     #this_corner = 'ss0p9v125c_cworst_CCworst_T'
     this_corner = 'tt1p0v100c'
     #this_partition = 'full_chip'
-    this_partition = 'processor_only'
+    this_partition = 'full_chip'
     #this_signoff_mode = 'afs'
     this_signoff_mode = 'normal'
     #ownercase_delete = TOwnerCase.objects.filter(check_item='signoff_timing', partition=this_partition, corner=this_corner, stage=this_stage)
@@ -198,7 +198,7 @@ def index(request):
 
 def parition_status(request, partition, corner, signoff_mode, check_mode):
     
-    #if partition == 'processor_only':
+    #if partition == 'full_chip':
     #    this_stage = 'R1'
     #else:
     #    this_stage = 'R0'
@@ -910,13 +910,13 @@ def other_check(request):
     #    print ('pathgroup_delete is: ', i)
     #    i.delete()
     #list all partion
-    #partition_set = ['full_chip','processor_only','core_cluster','hif_only','fsl_only',]
+    #partition_set = ['full_chip','full_chip','core_cluster','hif_only','fsl_only',]
     partition_set = ['full_chip']
     signoff_mode_set = ['normal', 'afs', 'atpg',]
     #signoff_mode_set = ['afs']
     #check_item_set = ['analog_connection_check','tweeter_balance_check']
     #partition_set = ['fsl_only']
-    #partition_set = ['core_only','processor_only']
+    #partition_set = ['core_only','full_chip']
 
     #others = TPathGroup.objects.all()
     #others = TPathGroup.objects.filter(partition='fsl_only')
