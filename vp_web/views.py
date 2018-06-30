@@ -40,13 +40,13 @@ def index(request):
         f = com.cfeature_set.filter(component=com)
         #print('feature type is: ', f)
         features = CVerification.objects.filter(pk=0)
-        #print('feature point is: ', features)
+        #print('verification point is: ', features)
     
         all_points = CVerification.objects.filter(pk=0)
         for i in f:
             a = CVerification.objects.filter(feature=i)
             all_points = chain(all_points, a)
-        #print('feature point is: ', all_points)
+        #print('verification point is: ', all_points)
 
         #got task finished status
         for i in all_points:
@@ -71,7 +71,7 @@ def index(request):
 
     #print(com_status)
 
-    com_status_header = ['component','all_task','finished_task','finished_status','']
+    com_status_header = ['component','all_task','finished_task','finished_status']
 
     return render(request,'vp_web/index.html',{
         #'title':'verfication tracking',
@@ -105,13 +105,13 @@ def index_status(request, pk):
         f = com.cfeature_set.filter(component=com)
         #print('feature type is: ', f)
         features = CVerification.objects.filter(pk=0)
-        #print('feature point is: ', features)
+        #print('verification point is: ', features)
     
         all_points = CVerification.objects.filter(pk=0)
         for i in f:
             a = CVerification.objects.filter(feature=i)
             all_points = chain(all_points, a)
-        #print('feature point is: ', all_points)
+        #print('verification point is: ', all_points)
 
         #got task finished status
         for i in all_points:
@@ -556,9 +556,9 @@ def get_html_content(item,mydict,review):
     #gen comment
     color = '#873422'
     if mydict['name'] == 'name':
-        comment = '<font color={1}>Please fill feature point\'s name</font>'.format(mydict['name'],color)
+        comment = '<font color={1}>Please fill verification point\'s name</font>'.format(mydict['name'],color)
     elif mydict['name'] == 'description':
-        comment = '<font color={1}>Please fill feature point\'s description, or the verification requeirement</font>'.format(mydict['name'],color)
+        comment = '<font color={1}>Please fill verification point\'s description, or the verification requeirement</font>'.format(mydict['name'],color)
     elif mydict['name'] == 'msr_info':
         comment = '<font color={1}>Please fill related msr info, like "0x1234[5]" or "no msr"</font>'.format(mydict['name'],color)
     elif mydict['name'] == 'feature_tag':
@@ -566,17 +566,17 @@ def get_html_content(item,mydict,review):
     elif mydict['name'] == 'coverage':
         comment = '<font color={1}>Please fill coverage file name, format is "c_xxx", like "c_DATA_lOAD"</font>'.format(mydict['name'],color)
     elif mydict['name'] == 'coverage_description':
-        comment = '<font color={1}>Please descripe how to confirm this feature point is happened</font>'.format(mydict['name'],color)
+        comment = '<font color={1}>Please descripe how to confirm this verification point is happened</font>'.format(mydict['name'],color)
     elif mydict['name'] == 'stimulus':
         comment = '<font color={1}>Please fill class/vector file name, like "dataload.sv" </font>'.format(mydict['name'],color)
     elif mydict['name'] == 'stimulus_other':
         comment = '<font color={1}>Please fill class/vector file name, it can be same as class for single socket</font>'.format(mydict['name'],color)
     elif mydict['name'] == 'stimulus_description':
-        comment = '<font color={1}>Please descripe how to tigger this feature point in class or user vector, can indicate weigth variable name if need</font>'.format(mydict['name'],color)
+        comment = '<font color={1}>Please descripe how to tigger this verification point in class or user vector, can indicate weigth variable name if need</font>'.format(mydict['name'],color)
     elif mydict['name'] == 'check_way':
         comment = '<font color={1}>Please fill checker name/error sva name/vector name, like "xxx checker" or "a_xxx" or "xxx.src"</font>'.format(mydict['name'],color)
     elif mydict['name'] == 'check_way_description':
-        comment = '<font color={1}>Please descripe how to capture bug when this feature point works wrong</font>'.format(mydict['name'],color)
+        comment = '<font color={1}>Please descripe how to capture bug when this verification point works wrong</font>'.format(mydict['name'],color)
     elif mydict['name'] in input_list:
         comment = '<font color={1}>Please fill {0} file name</font>'.format(mydict['name'],color)
     else:
@@ -1211,11 +1211,11 @@ def component_status_list(request,pk):
     f = com.cfeature_set.filter(component=com)
     #print('feature type is: ', f)
     features = CVerification.objects.filter(pk=0)
-    #print('feature point is: ', features)
+    #print('verification point is: ', features)
     for i in f:
         new = CVerification.objects.filter(feature=i)
         features = chain(features, new)
-    #print('feature point is: ', features)
+    #print('verification point is: ', features)
     
     all_points = CVerification.objects.filter(pk=0)
     for i in f:
