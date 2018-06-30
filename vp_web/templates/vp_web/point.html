@@ -92,12 +92,17 @@
     </div>
     </div>
 
-    <div class="submit-row">
-    <input type="submit" value="Submit" class="default" name="_save" />
+    <div class="submit-row" id="summit_comment">
+    <input type="submit" value="Submit Comment" class="default" name="_save" />
     </div>
 
+{% if delete_enable %}
+<HR style="FILTER: alpha(opacity=100,finishopacity=0,style=2)" width="100%" color=#417690 SIZE=3>
 
-
+    <div class="submit-row" id="delete_vp">
+    <input type="submit" value="Delete this VP" class="default" name="_delete" />
+    </div>
+{% endif %}
     
 </form>
 

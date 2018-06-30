@@ -90,7 +90,7 @@ float:left;
 padding-top:2px;
 padding-bottom:2px;
 margin:auto;
-font-size:0.8rem;
+font-size:14px;
 color:#aaa;
 text-align:right
 }
@@ -943,7 +943,7 @@ table#change-history tbody th {
 font-size:2.5rem;
 /*text-transform:lowercase;*/
 font-weight:300;
-line-height:3.125rem;
+line-height:40px;
 color:#316241
 }
 
@@ -1220,6 +1220,9 @@ text-align:center
     width: 100%;
     margin: 2em 0em 0em 1em;
     box-shadow: 10px 10px 5px #888888;
+}
+#object_in_feature{
+    margin-top: 4em    
 }
 .feature_status table {
 }
@@ -1572,4 +1575,19 @@ border: 1px solid #222;
     text-decoration: underline;
 }
 
+#index_setting{
+   width: 4em; 
+}
+
+#delete_feature{
+    padding-top: 3em;
+}
+
+#delete_vp{
+    padding-top: 5em;
+    float:left;
+}
+
+#summit_comment{
+}
 

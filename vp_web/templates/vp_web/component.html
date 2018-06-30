@@ -44,6 +44,9 @@
     <table id="result_list">
          <thead>
 	    <tr>
+        	<th scope="col" class="sortable column-type">
+		    <div class="text" id="index_setting">Index</div>
+	        </th>
             {% for item in owner_status_header %}
 		    <th scope="col" class="sortable column-type">
 		    <div class="clear">{{ item }}</div>
@@ -55,6 +58,7 @@
         {% for item in owner_status %}
 
 	    <tr class="{% cycle 'row1' 'row2' %}">
+            <td id="index_setting">{{forloop.counter}}</td>
             <td><a href={% url 'vp_web:feature' item.pk %}>{{ item.feature}}</a></td>
             <td>{{ item.owner}}</td>
             <td>{{ item.all_feature_status}}</td>
@@ -70,6 +74,16 @@
         <p class="errornote">There is no verification Feature</p>
     {% endif %}
 
-
     </form>
+
+{% if delete_enable %}
+<HR style="FILTER: alpha(opacity=100,finishopacity=0,style=2)" width="100%" color=#417690 SIZE=3>
+
+<form id="changelist-form" method="post" enctype="multipart/form-data" novalidate>{% csrf_token %}
+    <div class="submit-row" id="delete_feature">
+        <input type="submit" value="Delete this component" class="default" name="_delete" />
+    </div>
+</form>
+{% endif %}
+
 {% endblock %}

@@ -236,9 +236,26 @@ def feature(request,feature_id):
                 }
             ]
     get_fields(t_feature,fieldsets)  
+    
+    component_id = t_feature.component.id
 
     def get_item(item):
         return list(map(lambda a:getAttr(item,a,'point'),list_display))
+
+    u = str(request.user)
+    delete_enable = request.user == t_feature.owner or u == "admin"
+    #-------------------------------------------------------------------------------------
+    if "_delete" in request.POST:
+        try:
+            if delete_enable:
+                t_feature.delete()
+            else:
+                print('Sorry, you cant delete for you are not the feaeture owner or administer')
+
+            return HttpResponseRedirect(reverse('vp_web:component', kwargs = {"pk":component_id}))
+        except Exception as e:    
+            errornote = str(e)+"debug"
+    #-------------------------------------------------------------------------------------
 
     return render(request,'vp_web/feature.html',{
         'title':t_feature.name,
@@ -246,6 +263,7 @@ def feature(request,feature_id):
         'heads':list_display,
         'feature':t_feature,
         'infos':fieldsets,
+        'delete_enable':delete_enable,
         'results':list(map(get_item,items)),
         })
 
@@ -378,6 +396,24 @@ def component(request,pk):
 
     def get_item(item):
         return list(map(lambda a:getAttr(item,a,'feature'),list_display))
+
+    u = str(request.user)
+    #delete_enable = request.user == com.owner or u == "admin"
+    delete_enable = u == "admin"
+    print('delete_enable is', delete_enable)
+    #-------------------------------------------------------------------------------------
+    if "_delete" in request.POST:
+        try:
+            if delete_enable:
+                com.delete()
+            else:
+                print('Sorry, you cant delete for you are not the feaeture owner or administer')
+
+            return HttpResponseRedirect(reverse('vp_web:index', args = ()))
+        except Exception as e:    
+            errornote = str(e)+"debug"
+    #-------------------------------------------------------------------------------------
+
     return render(request,'vp_web/component.html',{
         'title':com.name,
         'description':com.description,
@@ -385,6 +421,7 @@ def component(request,pk):
         'component':com,
         'owner_status':owner_status,
         'owner_status_header':owner_status_header,       
+        'delete_enable':delete_enable,
         })
 
 # Create your views here.
@@ -636,12 +673,29 @@ def point(request,pk):
     get_fields(item,fieldsets)
     #print("************Felix point debug ", item.coverage_description)
 
+    feature_id = item.feature.id
+
+    u = str(request.user)
+    delete_enable = request.user == item.owner or u == "admin"
+    #-------------------------------------------------------------------------------------
+    if "_delete" in request.POST:
+        try:
+            if delete_enable:
+                item.delete()
+            else:
+                print('Sorry, you cant delete for you are not the feaeture owner or administer')
+            return HttpResponseRedirect(reverse('vp_web:feature', kwargs = {"feature_id":feature_id}))
+        except Exception as e:    
+            errornote = str(e)+"debug"
+    #-------------------------------------------------------------------------------------
+
     return render(request,'vp_web/point.html',{
         'title': item.name,
         #'description': item.description,
         'description': '',
         'point':item,
         'infos':fieldsets,
+        'delete_enable':delete_enable,
         })
 
 def addFeature(request,com):
@@ -671,7 +725,7 @@ def add_feature(request,pk):
     if "_save" in request.POST:
         try:
             addFeature(request,com)
-            return HttpResponseRedirect(reverse('vp_web:index'))
+            return HttpResponseRedirect(reverse('vp_web:component', kwargs = {"pk":com.id}))
         except Exception as e:    
             errornote = str(e)
 

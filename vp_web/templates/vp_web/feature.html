@@ -32,8 +32,19 @@
 
 {% block coltype %}flex{% endblock %}
 
-{% block content %}
+  {% block pretitle %}
+  <div id="object_in_feature">
+    <ul class="object-tools">
+    <li>
+    <a href="{% url 'vp_web:change_feature' feature.id %}" class="historylink">Modified Feature Type</a>
+    <a href="{% url 'vp_web:add_verification' feature.id %}" class="addlink">Add Verification Point</a>
+    </li>    
+  </ul>
+  </div>
+  {% endblock %}
     <form id="changelist-form" method="post" enctype="multipart/form-data" novalidate>{% csrf_token %}
+
+{% block content %}
 
     {% if errornote %}
     <p class="errornote">
@@ -41,20 +52,14 @@
     </p>
     {% endif %}
 
-    <ul class="object-tools">
-    
-    <li>
-    <a href="{% url 'vp_web:change_feature' feature.id %}" class="historylink">Modified Feature Type</a>
-    <a href="{% url 'vp_web:add_verification' feature.id %}" class="addlink">Add Verification Point</a>
-    </li>    
-  </ul>
-
-
     {% if results %}
-    <div class="feature_status">
+    <div class="feature_status" id="feature_html">
     <table>
 	<thead>
 	    <tr>
+		<th scope="col" class="sortable column-type">
+		<div class="text" id="index_setting">Index</div>
+	    </th>
 		{% for header in heads %}
 		<th scope="col" class="sortable column-type">
 		<div class="text">{{ header |capfirst }}</div>
@@ -64,7 +69,10 @@
 	</thead>
 	<tbody>
 	    {% for result in results %}
-		<tr class="{% cycle 'row1' 'row2' %}">{% for item in result %}{{ item }}{% endfor %}</tr>
+		<tr class="{% cycle 'row1' 'row2' %}">
+            <td id="index_setting">{{forloop.counter}}</td>
+            {% for item in result %}{{ item }}{% endfor %}
+        </tr>
 	    {% endfor %}
 	</tbody>
     </table>
@@ -73,7 +81,16 @@
     <p class="errornote">There is no verification Point</p>
 
 {% endif %}
-
-
     </form>
+
+{% if delete_enable %}
+<HR style="FILTER: alpha(opacity=100,finishopacity=0,style=2)" width="100%" color=#417690 SIZE=3>
+
+<form id="changelist-form" method="post" enctype="multipart/form-data" novalidate>{% csrf_token %}
+    <div class="submit-row" id="delete_feature">
+        <input type="submit" value="Delete this feature" class="default" name="_delete" />
+    </div>
+</form>
+{% endif %}
+
 {% endblock %}
