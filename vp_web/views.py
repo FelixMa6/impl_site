@@ -136,7 +136,7 @@ def index_status(request, pk):
 
     #print(com_status)
 
-    com_status_header = ['component','all_task','finished_task','finished_status','']
+    com_status_header = ['component','all_task','finished_task','finished_status']
         #------------------------------------------------------------------------------------
     user = get_object_or_404(User,pk=pk)
     #features = CFeature.objects.filter(owner=user)
